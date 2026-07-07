@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SettingsPanel } from './components/SettingsPanel';
 import { JobInput } from './components/JobInput';
 import { CVDisplay } from './components/CVDisplay';
@@ -27,6 +27,7 @@ function App() {
   // Theme & Sidebar States (Iteration 2)
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const [generating, setGenerating] = useState(false);
   const [isAutoFixing, setIsAutoFixing] = useState(false);
@@ -152,17 +153,23 @@ function App() {
 
     setGenerating(true);
     setError(null);
+    abortControllerRef.current = new AbortController();
     
     const activeCVs = activeCVIndices.map((idx) => contextCVs[idx]);
 
     try {
-      const cvResult = await generateCustomizedCV(config, activeCVs, jobDescription, aspirations);
+      const cvResult = await generateCustomizedCV(config, activeCVs, jobDescription, aspirations, abortControllerRef.current.signal);
       setResult(cvResult);
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.log('CV generation cancelled by user.');
+        return; // Don't show error if cancelled intentionally
+      }
       console.error(err);
       setError(err.message || 'An unexpected error occurred while communicating with the LLM API.');
     } finally {
       setGenerating(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -172,16 +179,28 @@ function App() {
     setGenerating(true);
     setIsAutoFixing(true);
     setError(null);
+    abortControllerRef.current = new AbortController();
 
     try {
-      const fixedResult = await autoFixCV(config, result.cvMarkdown, jobDescription, result.atsAnalysis);
+      const fixedResult = await autoFixCV(config, result.cvMarkdown, jobDescription, result.atsAnalysis, abortControllerRef.current.signal);
       setResult(fixedResult);
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.log('Auto-fix cancelled by user.');
+        return; // Don't show error if cancelled intentionally
+      }
       console.error(err);
       setError(err.message || 'An unexpected error occurred while auto-fixing with the LLM API.');
     } finally {
       setGenerating(false);
       setIsAutoFixing(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
   };
 
@@ -318,6 +337,14 @@ function App() {
             </div>
             <div className="scanner-text">{getLoaderText().title}</div>
             <div className="scanner-subtext">{getLoaderText().desc}</div>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleCancel}
+              style={{ marginTop: '1.5rem', width: 'auto', padding: '0.5rem 1.5rem', background: 'rgba(255,59,48,0.1)', color: 'var(--danger)', borderColor: 'rgba(255,59,48,0.2)' }}
+            >
+              Cancel Request
+            </button>
           </div>
         )}
 

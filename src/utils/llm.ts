@@ -26,14 +26,15 @@ export async function generateCustomizedCV(
   config: LLMConfig,
   contextCVs: { name: string; text: string }[],
   jobDescription: string,
-  aspirations: string
+  aspirations: string,
+  signal?: AbortSignal
 ): Promise<CVGenerationResult> {
   const systemPrompt = `You are an expert resume writer and recruiter specializing in ATS (Applicant Tracking System) optimization and human-friendly storytelling.
 Your job is to rewrite a candidate's resume/career history to perfectly align with a target Job Description (JD) and also write a customized cover letter.
 
 Here are the strict guidelines:
 1. **Truthfulness**: Rely ONLY on facts, roles, and achievements present in the provided career history (uploaded CVs). Do NOT invent jobs, companies, credentials, or achievements.
-2. **ATS Optimization**: Identify critical keywords, technical skills, and phrases in the Job Description, and naturally integrate them into the candidate's experience where applicable.
+2. **ATS Optimization**: Identify critical keywords, technical skills, and phrases in the Job Description, and naturally integrate them into the candidate's experience where applicable. **CRITICAL: You MUST aim for a >95% ATS keyword match score. Ruthlessly find organic ways to include as many target keywords as mathematically possible without lying.**
 3. **Strict 2-Page Constraint**: Ensure the resume is highly optimized, concise, and fits strictly within a 2-page ceiling (approximately 500-750 words). Filter out minor or redundant details, and focus on high-impact accomplishments.
 4. **Professional Formatting**: Format headings to match the user's specific CV format:
    - The very top of the resume MUST start with the candidate's Name as an H1, immediately followed by the exact Target Job Title (from the JD) as an italicized subtitle on the next line. Like this:
@@ -68,18 +69,18 @@ ${aspirations || "None specified. Focus on general alignment with the target JD.
 2. Review the candidate's career history and extract all relevant achievements, roles, and skills.
 3. Construct a single, highly tailored CV in Markdown format that showcases the candidate's fit for this specific job, incorporating relevant keywords naturally. Keep the text concise to fit strictly within 2 pages when rendered.
 4. Format job/education headings using the 'Title | Dates' and 'Subtitle | Location' syntax described in guidelines.
-5. Estimate the ATS score (0 to 100) based on keyword matching.
+5. Estimate the ATS score (0 to 100) based on keyword matching. Aim for >95% by including almost all relevant keywords natively in the text.
 6. List matched keywords, missing keywords, strengths, weaknesses, and actionable items.
 7. Write a custom, concise, and high-impact Cover Letter (under 250 words) targeting this job.
 8. List the key human-friendly changes you made (e.g., rewording, focusing on impact).
 `;
 
   if (config.provider === 'gemini') {
-    return callGemini(config, systemPrompt, userPrompt);
+    return callGemini(config, systemPrompt, userPrompt, signal);
   } else if (config.provider === 'openai') {
-    return callOpenAI(config, systemPrompt, userPrompt);
+    return callOpenAI(config, systemPrompt, userPrompt, signal);
   } else if (config.provider === 'anthropic') {
-    return callAnthropic(config, systemPrompt, userPrompt);
+    return callAnthropic(config, systemPrompt, userPrompt, signal);
   } else {
     throw new Error(`Unsupported provider: ${config.provider}`);
   }
@@ -89,14 +90,15 @@ export async function autoFixCV(
   config: LLMConfig,
   currentMarkdown: string,
   jobDescription: string,
-  atsAnalysis: ATSAnalysis
+  atsAnalysis: ATSAnalysis,
+  signal?: AbortSignal
 ): Promise<CVGenerationResult> {
   const systemPrompt = `You are an expert resume writer and recruiter specializing in ATS (Applicant Tracking System) optimization and human-friendly storytelling.
 Your job is to REVISE and IMPROVE an existing candidate's resume to incorporate specific missing keywords and fix weaknesses identified in an ATS scan.
 
 Here are the strict guidelines:
 1. **Truthfulness**: ONLY incorporate new keywords if they logically fit into the existing roles and achievements. Do not invent entirely new jobs.
-2. **ATS Optimization**: Weave the provided Missing Keywords into the bullet points organically. Address the identified Weaknesses by expanding or rephrasing existing bullet points.
+2. **ATS Optimization**: Weave the provided Missing Keywords into the bullet points organically. **CRITICAL: You MUST aggressively incorporate these missing keywords to push the ATS match score above 95%.** Address the identified Weaknesses by expanding or rephrasing existing bullet points.
 3. **Format Preservation**: You MUST output the ENTIRE updated CV in Markdown. You MUST preserve the exact layout and structure of the original Markdown provided to you.
 4. **Human Readability**: Ensure the new additions sound natural, professional, and truthful, rather than artificially stuffed.
 5. **Custom Cover Letter**: Also provide a revised Cover Letter that reflects the stronger alignment with the Job Description.`;
@@ -122,17 +124,17 @@ ${currentMarkdown}
 `;
 
   if (config.provider === 'gemini') {
-    return callGemini(config, systemPrompt, userPrompt);
+    return callGemini(config, systemPrompt, userPrompt, signal);
   } else if (config.provider === 'openai') {
-    return callOpenAI(config, systemPrompt, userPrompt);
+    return callOpenAI(config, systemPrompt, userPrompt, signal);
   } else if (config.provider === 'anthropic') {
-    return callAnthropic(config, systemPrompt, userPrompt);
+    return callAnthropic(config, systemPrompt, userPrompt, signal);
   } else {
     throw new Error(`Unsupported provider: ${config.provider}`);
   }
 }
 
-async function callGemini(config: LLMConfig, systemPrompt: string, userPrompt: string): Promise<CVGenerationResult> {
+async function callGemini(config: LLMConfig, systemPrompt: string, userPrompt: string, signal?: AbortSignal): Promise<CVGenerationResult> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${config.apiKey}`;
 
   const payload = {
@@ -175,7 +177,8 @@ async function callGemini(config: LLMConfig, systemPrompt: string, userPrompt: s
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    signal
   });
 
   if (!response.ok) {
@@ -197,7 +200,7 @@ async function callGemini(config: LLMConfig, systemPrompt: string, userPrompt: s
   }
 }
 
-async function callOpenAI(config: LLMConfig, systemPrompt: string, userPrompt: string): Promise<CVGenerationResult> {
+async function callOpenAI(config: LLMConfig, systemPrompt: string, userPrompt: string, signal?: AbortSignal): Promise<CVGenerationResult> {
   const url = 'https://api.openai.com/v1/chat/completions';
 
   const response = await fetch(url, {
@@ -213,7 +216,8 @@ async function callOpenAI(config: LLMConfig, systemPrompt: string, userPrompt: s
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt + '\nIMPORTANT: You must return the output as a valid JSON object matching this TypeScript structure: { cvMarkdown: string, atsScore: number, atsAnalysis: { matchedKeywords: string[], missingKeywords: string[], strengths: string[], weaknesses: string[], actionItems: string[] }, humanFriendlyChanges: string[], coverLetter: string }' }
       ]
-    })
+    }),
+    signal
   });
 
   if (!response.ok) {
@@ -234,7 +238,7 @@ async function callOpenAI(config: LLMConfig, systemPrompt: string, userPrompt: s
   }
 }
 
-async function callAnthropic(config: LLMConfig, systemPrompt: string, userPrompt: string): Promise<CVGenerationResult> {
+async function callAnthropic(config: LLMConfig, systemPrompt: string, userPrompt: string, signal?: AbortSignal): Promise<CVGenerationResult> {
   const url = 'https://api.anthropic.com/v1/messages';
 
   const response = await fetch(url, {
@@ -252,7 +256,8 @@ async function callAnthropic(config: LLMConfig, systemPrompt: string, userPrompt
       messages: [
         { role: 'user', content: userPrompt + '\nIMPORTANT: You must output ONLY a valid JSON object, with no conversational preamble or postamble. The JSON must match this structure: { "cvMarkdown": "...", "atsScore": 85, "atsAnalysis": { "matchedKeywords": [], "missingKeywords": [], "strengths": [], "weaknesses": [], "actionItems": [] }, "humanFriendlyChanges": [], "coverLetter": "..." }' }
       ]
-    })
+    }),
+    signal
   });
 
   if (!response.ok) {

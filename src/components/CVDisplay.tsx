@@ -14,11 +14,6 @@ type TabType = 'preview' | 'editor' | 'ats' | 'tweaks' | 'cover';
 export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown, onAutoFix }) => {
   const [activeTab, setActiveTab] = useState<TabType>('preview');
   const [copied, setCopied] = useState<'markdown' | 'text' | 'cover' | null>(null);
-  
-  // Reset active tab to preview whenever a new result is generated
-  useEffect(() => {
-    setActiveTab('preview');
-  }, [result.cvMarkdown]);
 
   const handleCopyMarkdown = () => {
     navigator.clipboard.writeText(result.cvMarkdown);
