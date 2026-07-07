@@ -6,11 +6,12 @@ import { parseMarkdownToHtml, stripMarkdown } from '../utils/mdParser';
 interface CVDisplayProps {
   result: CVGenerationResult;
   onUpdateMarkdown: (markdown: string) => void;
+  onAutoFix?: () => void;
 }
 
 type TabType = 'preview' | 'editor' | 'ats' | 'tweaks' | 'cover';
 
-export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown }) => {
+export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown, onAutoFix }) => {
   const [activeTab, setActiveTab] = useState<TabType>('preview');
   const [copied, setCopied] = useState<'markdown' | 'text' | 'cover' | null>(null);
   
@@ -173,16 +174,26 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown }
         )}
 
         {activeTab === 'editor' && (
-          <div className="pane">
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Edit the markdown below. Changes will immediately sync to the PDF preview tab.
-            </p>
-            <textarea
-              className="markdown-textarea"
-              value={result.cvMarkdown}
-              onChange={(e) => onUpdateMarkdown(e.target.value)}
-              placeholder="Edit your CV here in markdown..."
-            />
+          <div className="pane" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', height: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                Edit the markdown below. Changes will immediately sync to the live preview on the right.
+              </p>
+              <textarea
+                className="markdown-textarea"
+                style={{ flexGrow: 1, minHeight: '600px' }}
+                value={result.cvMarkdown}
+                onChange={(e) => onUpdateMarkdown(e.target.value)}
+                placeholder="Edit your CV here in markdown..."
+              />
+            </div>
+            <div className="print-pane" style={{ background: 'var(--bg-primary)', padding: '1rem', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'center', overflowX: 'auto', overflowY: 'auto', border: '1px solid var(--card-border)', maxHeight: 'calc(600px + 1.5rem)' }}>
+              <div 
+                className="resume-preview-sheet" 
+                style={{ transform: 'scale(0.8)', transformOrigin: 'top center', marginBottom: '-20%' }}
+                dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(result.cvMarkdown) }}
+              />
+            </div>
           </div>
         )}
 
@@ -209,6 +220,15 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown }
             </div>
 
             <div className="ats-breakdown">
+              <div className="flex-row-between" style={{ flexWrap: 'wrap', gap: '1rem', marginBottom: '0.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--card-border)' }}>
+                <h3 style={{ color: 'var(--text-primary)', margin: 0 }}>ATS Gap Analysis</h3>
+                {onAutoFix && (
+                  <button type="button" className="btn btn-primary" onClick={onAutoFix} style={{ width: 'auto', padding: '0.4rem 1rem' }} title="Send the CV back to the LLM to organically weave in missing keywords and address weaknesses">
+                    <Sparkles size={16} /> Auto-Fix Gaps
+                  </button>
+                )}
+              </div>
+
               <div className="ats-section-card matched">
                 <h4>Matched Keywords ({result.atsAnalysis.matchedKeywords.length})</h4>
                 {result.atsAnalysis.matchedKeywords.length === 0 ? (

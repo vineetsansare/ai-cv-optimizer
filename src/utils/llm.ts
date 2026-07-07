@@ -85,6 +85,53 @@ ${aspirations || "None specified. Focus on general alignment with the target JD.
   }
 }
 
+export async function autoFixCV(
+  config: LLMConfig,
+  currentMarkdown: string,
+  jobDescription: string,
+  atsAnalysis: ATSAnalysis
+): Promise<CVGenerationResult> {
+  const systemPrompt = `You are an expert resume writer and recruiter specializing in ATS (Applicant Tracking System) optimization and human-friendly storytelling.
+Your job is to REVISE and IMPROVE an existing candidate's resume to incorporate specific missing keywords and fix weaknesses identified in an ATS scan.
+
+Here are the strict guidelines:
+1. **Truthfulness**: ONLY incorporate new keywords if they logically fit into the existing roles and achievements. Do not invent entirely new jobs.
+2. **ATS Optimization**: Weave the provided Missing Keywords into the bullet points organically. Address the identified Weaknesses by expanding or rephrasing existing bullet points.
+3. **Format Preservation**: You MUST output the ENTIRE updated CV in Markdown. You MUST preserve the exact layout and structure of the original Markdown provided to you.
+4. **Human Readability**: Ensure the new additions sound natural, professional, and truthful, rather than artificially stuffed.
+5. **Custom Cover Letter**: Also provide a revised Cover Letter that reflects the stronger alignment with the Job Description.`;
+
+  const userPrompt = `
+=== TARGET JOB DESCRIPTION ===
+${jobDescription}
+
+=== IDENTIFIED ATS GAPS ===
+Missing Keywords: ${atsAnalysis.missingKeywords.join(', ') || 'None'}
+Weaknesses: ${atsAnalysis.weaknesses.join('; ') || 'None'}
+Action Items: ${atsAnalysis.actionItems.join('; ') || 'None'}
+
+=== CURRENT CV MARKDOWN ===
+${currentMarkdown}
+
+=== TASK ===
+1. Rewrite the CURRENT CV MARKDOWN to organically include the Missing Keywords and address the Weaknesses.
+2. Return the ENTIRE updated Markdown CV.
+3. Recalculate the ATS score and analysis (the score should improve since you fixed the gaps).
+4. Provide a revised Cover Letter.
+5. Detail the specific human-friendly changes you made to incorporate the keywords naturally.
+`;
+
+  if (config.provider === 'gemini') {
+    return callGemini(config, systemPrompt, userPrompt);
+  } else if (config.provider === 'openai') {
+    return callOpenAI(config, systemPrompt, userPrompt);
+  } else if (config.provider === 'anthropic') {
+    return callAnthropic(config, systemPrompt, userPrompt);
+  } else {
+    throw new Error(`Unsupported provider: ${config.provider}`);
+  }
+}
+
 async function callGemini(config: LLMConfig, systemPrompt: string, userPrompt: string): Promise<CVGenerationResult> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${config.apiKey}`;
 

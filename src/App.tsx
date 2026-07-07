@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { SettingsPanel } from './components/SettingsPanel';
 import { JobInput } from './components/JobInput';
 import { CVDisplay } from './components/CVDisplay';
-import { generateCustomizedCV } from './utils/llm';
+import { generateCustomizedCV, autoFixCV } from './utils/llm';
 import type { LLMConfig, CVGenerationResult } from './utils/llm';
 import { AlertCircle, Sparkles, Wand2, Sun, Moon } from 'lucide-react';
 
@@ -29,6 +29,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [generating, setGenerating] = useState(false);
+  const [isAutoFixing, setIsAutoFixing] = useState(false);
   const [genStep, setGenStep] = useState(0); 
   const [result, setResult] = useState<CVGenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -165,6 +166,25 @@ function App() {
     }
   };
 
+  const handleAutoFix = async () => {
+    if (!result) return;
+    
+    setGenerating(true);
+    setIsAutoFixing(true);
+    setError(null);
+
+    try {
+      const fixedResult = await autoFixCV(config, result.cvMarkdown, jobDescription, result.atsAnalysis);
+      setResult(fixedResult);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'An unexpected error occurred while auto-fixing with the LLM API.');
+    } finally {
+      setGenerating(false);
+      setIsAutoFixing(false);
+    }
+  };
+
   const handleUpdateMarkdown = (newMarkdown: string) => {
     if (result) {
       setResult({
@@ -176,6 +196,16 @@ function App() {
 
   // Loading animation step messages
   const getLoaderText = () => {
+    if (isAutoFixing) {
+      switch (genStep) {
+        case 0: return { title: 'Analyzing Gaps', desc: 'Identifying the missing keywords and weaknesses from the ATS scan...' };
+        case 1: return { title: 'Weaving Keywords', desc: 'Organically injecting keywords into your bullet points without sounding robotic...' };
+        case 2: return { title: 'Refining Tone', desc: 'Applying a human-friendly polish to the newly generated achievements...' };
+        case 3: return { title: 'Updating Cover Letter', desc: 'Aligning the cover letter with the newly strengthened CV...' };
+        default: return { title: 'Processing Auto-Fix', desc: 'Optimizing your resume...' };
+      }
+    }
+    
     switch (genStep) {
       case 0: return { title: 'Scanning Job Description', desc: 'Analyzing the JD to extract core technical stack, keywords, and soft skills requirements...' };
       case 1: return { title: 'Mapping Career Experience', desc: 'Searching your uploaded profiles to find matching achievements, roles, and project evidence...' };
@@ -295,6 +325,7 @@ function App() {
           <CVDisplay
             result={result}
             onUpdateMarkdown={handleUpdateMarkdown}
+            onAutoFix={handleAutoFix}
           />
         )}
       </main>

@@ -564,7 +564,7 @@ textarea {
 /* Exact section divider header styling from PDF */
 .resume-preview-sheet h2 {
   font-size: 11pt;
-  border-top: 2px solid #111827 !important;
+  border-top: 1px solid #111827 !important;
   border-bottom: 1px solid #111827 !important;
   padding: 4px 0 !important;
   margin-top: 1.5rem !important;
