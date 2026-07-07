@@ -232,40 +232,8 @@ function App() {
           </div>
         )}
 
-        <JobInput
-          jobDescription={jobDescription}
-          onChangeJobDescription={setJobDescription}
-          aspirations={aspirations}
-          onChangeAspirations={setAspirations}
-          config={config}
-          contextCVs={contextCVs}
-          activeCVIndices={activeCVIndices}
-          onToggleCVIndex={handleToggleCVIndex}
-          onGenerate={handleGenerate}
-          generating={generating}
-        />
-
-        {generating && (
-          <div className="glass-card scanner-container">
-            <div className="radar-sweep">
-              <div className="radar-scan-line"></div>
-              <div className="radar-grid"></div>
-              <Wand2 size={36} style={{ zIndex: 10, color: 'var(--accent-primary)' }} />
-            </div>
-            <div className="scanner-text">{getLoaderText().title}</div>
-            <div className="scanner-subtext">{getLoaderText().desc}</div>
-          </div>
-        )}
-
-        {!generating && result && (
-          <CVDisplay
-            result={result}
-            onUpdateMarkdown={handleUpdateMarkdown}
-          />
-        )}
-
         {!generating && !result && (
-          <div className="glass-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginTop: '0.5rem' }}>
+          <div className="glass-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '0.5rem' }}>
             <div>
               <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>1</span>
@@ -296,6 +264,38 @@ function App() {
               </p>
             </div>
           </div>
+        )}
+
+        <JobInput
+          jobDescription={jobDescription}
+          onChangeJobDescription={setJobDescription}
+          aspirations={aspirations}
+          onChangeAspirations={setAspirations}
+          config={config}
+          contextCVs={contextCVs}
+          activeCVIndices={activeCVIndices}
+          onToggleCVIndex={handleToggleCVIndex}
+          onGenerate={handleGenerate}
+          generating={generating}
+        />
+
+        {generating && (
+          <div className="glass-card scanner-container">
+            <div className="radar-sweep">
+              <div className="radar-scan-line"></div>
+              <div className="radar-grid"></div>
+              <Wand2 size={36} style={{ zIndex: 10, color: 'var(--accent-primary)' }} />
+            </div>
+            <div className="scanner-text">{getLoaderText().title}</div>
+            <div className="scanner-subtext">{getLoaderText().desc}</div>
+          </div>
+        )}
+
+        {!generating && result && (
+          <CVDisplay
+            result={result}
+            onUpdateMarkdown={handleUpdateMarkdown}
+          />
         )}
       </main>
     </div>

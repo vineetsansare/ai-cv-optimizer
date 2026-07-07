@@ -36,6 +36,10 @@ Here are the strict guidelines:
 2. **ATS Optimization**: Identify critical keywords, technical skills, and phrases in the Job Description, and naturally integrate them into the candidate's experience where applicable.
 3. **Strict 2-Page Constraint**: Ensure the resume is highly optimized, concise, and fits strictly within a 2-page ceiling (approximately 500-750 words). Filter out minor or redundant details, and focus on high-impact accomplishments.
 4. **Professional Formatting**: Format headings to match the user's specific CV format:
+   - The very top of the resume MUST start with the candidate's Name as an H1, immediately followed by the exact Target Job Title (from the JD) as an italicized subtitle on the next line. Like this:
+     # [Candidate Name]
+     *[Target Job Title]*
+     email | phone | location | linkedin
    - Job Experience headers MUST be written as:
      ### Job Title | Dates
      *Company Name | Location*
@@ -45,7 +49,8 @@ Here are the strict guidelines:
    - Standard sections headings MUST be: EXECUTIVE PROFILE, PROFESSIONAL EXPERIENCE, TECHNICAL SKILLS & COMPETENCIES, CORE IMPACT & CAREER HIGHLIGHTS, EDUCATION.
    - For TECHNICAL SKILLS & COMPETENCIES, write the skills as a bulleted list where each bullet starts with the bold category and a colon, e.g.:
      * **Mobile Architecture**: Modular Architecture, MVVM, Swift, ...
-5. **Human Readability**: Do not over-optimize to the point of keyword stuffing. Use strong action verbs, quantifiable accomplishments, and clear bullet points.
+   - Use bolding (**text**) judiciously throughout the CV to highlight key technical skills, impactful metrics, and critical qualifications to draw the recruiter's eye.
+5. **Human Readability**: Ensure the content sounds like it is written by a normal human professional, not copy-pasted from an AI tool. Avoid robotic transitions, cliché AI buzzwords, or overly complex vocabulary. Build credibility and trust through clear, authentic, and factual storytelling.
 6. **Custom Cover Letter**: Write a short, punchy, and summarized Cover Letter (under 250 words) targeted to the recruiting team of the organization in the JD. It should highlight the applicant's top matches, explain their interest, and make it extremely easy for a recruiter to shortlist the candidate.`;
 
   const userPrompt = `

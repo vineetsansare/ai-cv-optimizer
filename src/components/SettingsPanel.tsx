@@ -111,8 +111,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
 
-      {/* COLLAPSED VIEW (Icon-Only Mode) */}
-      {collapsed ? (
+      <div className="sidebar-scroll-area">
+        {/* COLLAPSED VIEW (Icon-Only Mode) */}
+        {collapsed ? (
         <div className="collapsed-icon-only" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '2.5rem', alignItems: 'center' }}>
           <div title="LLM Configurations" className="flex-row-gap" style={{ cursor: 'pointer', position: 'relative' }} onClick={onToggleCollapse}>
             <Settings size={24} className="text-accent-primary" />
@@ -284,7 +285,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             CV Customizer v1.2.0
           </div>
         </div>
-      )}
+        )}
+      </div>
     </aside>
   );
 };
