@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Eye, FileEdit, BarChart3, Sparkles, Printer, Copy, Check, Mail } from 'lucide-react';
 import type { CVGenerationResult } from '../utils/llm';
 import { parseMarkdownToHtml, stripMarkdown } from '../utils/mdParser';
