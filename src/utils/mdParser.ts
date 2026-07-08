@@ -148,12 +148,24 @@ export function parseMarkdownToHtml(markdown: string): string {
           skillsListOpen = true;
         }
 
+        // Parse bold text, italics, and links for the content
+        let formattedContent = content
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
         // Check if item starts with bold text category, e.g. **Mobile Architecture**: Swift...
         const categoryMatch = content.match(/^\*\*(.*?)\*\*:\s*(.*)$/);
         if (categoryMatch) {
-          processedLines.push(`<li><strong>${categoryMatch[1]}</strong>${categoryMatch[2]}</li>`);
+          // Parse the remainder for inline bold
+          let remainder = categoryMatch[2]
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+            
+          processedLines.push(`<li><strong class="skill-category">${categoryMatch[1]}</strong>${remainder}</li>`);
         } else {
-          processedLines.push(`<li>${content}</li>`);
+          processedLines.push(`<li>${formattedContent}</li>`);
         }
       } else {
         // Standard work bullet list

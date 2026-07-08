@@ -666,11 +666,15 @@ textarea {
   line-height: 1.4;
 }
 
-.resume-preview-sheet .skills-list strong {
+.resume-preview-sheet .skills-list strong.skill-category {
   color: #111827;
   font-weight: 700;
   display: block;
   margin-bottom: 0.15rem;
+}
+
+.resume-preview-sheet .skills-list strong {
+  font-weight: 700;
 }
 
 /* Cover letter text styling */
