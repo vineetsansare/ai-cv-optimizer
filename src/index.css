@@ -487,18 +487,14 @@ textarea {
 
 /* The A4 Resume Preview Sheet */
 .resume-preview-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 12mm 15mm;
   background: #ffffff;
   color: #111827;
-  padding: 2.5rem 3rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  min-height: 297mm;
-  width: 100%;
-  max-width: 210mm;
-  margin: 0 auto;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 10pt;
-  line-height: 1.45;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 9.5pt;
+  line-height: 1.35;
   box-sizing: border-box;
 }
 
@@ -563,12 +559,12 @@ textarea {
 
 /* Exact section divider header styling from PDF */
 .resume-preview-sheet h2 {
-  font-size: 11pt;
+  font-size: 10.5pt;
   border-top: 1px solid #111827 !important;
   border-bottom: 1px solid #111827 !important;
-  padding: 4px 0 !important;
-  margin-top: 1.5rem !important;
-  margin-bottom: 0.85rem !important;
+  padding: 3px 0 !important;
+  margin-top: 1.2rem !important;
+  margin-bottom: 0.6rem !important;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   text-align: center;
@@ -630,22 +626,22 @@ textarea {
 .resume-preview-sheet li {
   text-align: justify;
   text-justify: inter-word;
-  font-size: 10pt;
+  font-size: 9.5pt;
   color: #1f2937;
-  line-height: 1.45;
+  line-height: 1.35;
 }
 
 .resume-preview-sheet p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .resume-preview-sheet ul {
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.6rem;
   padding-left: 1.25rem;
 }
 
 .resume-preview-sheet li {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 
 /* Technical skills 2-column grid layout */

@@ -59,7 +59,12 @@ ${lengthConstraint}
    - Education headers MUST be written as:
      ### Degree Name | Dates
      *School Name | Location*
-   - Standard sections headings MUST be: EXECUTIVE PROFILE, PROFESSIONAL EXPERIENCE, TECHNICAL SKILLS & COMPETENCIES, CORE IMPACT & CAREER HIGHLIGHTS, EDUCATION.
+   - Standard sections headings MUST be formatted as H2 headings exactly like this: 
+     ## EXECUTIVE PROFILE
+     ## PROFESSIONAL EXPERIENCE
+     ## TECHNICAL SKILLS & COMPETENCIES
+     ## CORE IMPACT & CAREER HIGHLIGHTS
+     ## EDUCATION
    - For TECHNICAL SKILLS & COMPETENCIES, write the skills as a bulleted list where each bullet starts with the bold category and a colon, e.g.:
      * **Mobile Architecture**: Modular Architecture, MVVM, Swift, ...
    - Use bolding (**text**) judiciously throughout the CV to highlight key technical skills, impactful metrics, and critical qualifications to draw the recruiter's eye.
