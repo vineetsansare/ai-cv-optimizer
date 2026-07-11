@@ -3,7 +3,7 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { JobInput } from './components/JobInput';
 import { CVDisplay } from './components/CVDisplay';
 import { generateCustomizedCV, autoFixCV } from './utils/llm';
-import type { LLMConfig, CVGenerationResult } from './utils/llm';
+import type { LLMConfig, CVGenerationResult, TargetLength } from './utils/llm';
 import { AlertCircle, Sparkles, Wand2, Sun, Moon } from 'lucide-react';
 
 const LOCAL_STORAGE_KEY_CONFIG = 'cv_builder_llm_config';
@@ -23,6 +23,7 @@ function App() {
   const [activeCVIndices, setActiveCVIndices] = useState<number[]>([]);
   const [jobDescription, setJobDescription] = useState('');
   const [aspirations, setAspirations] = useState('');
+  const [targetLength, setTargetLength] = useState<TargetLength>('2-page');
   
   // Theme & Sidebar States (Iteration 2)
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -158,7 +159,7 @@ function App() {
     const activeCVs = activeCVIndices.map((idx) => contextCVs[idx]);
 
     try {
-      const cvResult = await generateCustomizedCV(config, activeCVs, jobDescription, aspirations, abortControllerRef.current.signal);
+      const cvResult = await generateCustomizedCV(config, activeCVs, jobDescription, aspirations, targetLength, abortControllerRef.current.signal);
       setResult(cvResult);
     } catch (err: any) {
       if (err.name === 'AbortError') {
@@ -320,6 +321,8 @@ function App() {
           onChangeJobDescription={setJobDescription}
           aspirations={aspirations}
           onChangeAspirations={setAspirations}
+          targetLength={targetLength}
+          onChangeTargetLength={setTargetLength}
           config={config}
           contextCVs={contextCVs}
           activeCVIndices={activeCVIndices}

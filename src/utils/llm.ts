@@ -22,20 +22,32 @@ export interface CVGenerationResult {
   coverLetter: string; // Added for Iteration 2
 }
 
+export type TargetLength = '1-page' | '2-page' | 'comprehensive';
+
 export async function generateCustomizedCV(
   config: LLMConfig,
   contextCVs: { name: string; text: string }[],
   jobDescription: string,
   aspirations: string,
+  targetLength: TargetLength,
   signal?: AbortSignal
 ): Promise<CVGenerationResult> {
+  let lengthConstraint = "";
+  if (targetLength === '1-page') {
+    lengthConstraint = "3. **Strict 1-Page Resume Constraint**: Ensure the resume is ruthlessly optimized, concise, and fits strictly within a 1-page ceiling (approx 350-450 words). Limit roles to the most recent 10 years, heavily truncate older roles to 1-liners, and allow a maximum of 3 highly impactful bullet points per role.";
+  } else if (targetLength === '2-page') {
+    lengthConstraint = "3. **Strict 2-Page Constraint**: Ensure the resume is highly optimized, concise, and fits strictly within a 2-page ceiling (approximately 500-750 words). Filter out minor or redundant details, and focus on high-impact accomplishments.";
+  } else {
+    lengthConstraint = "3. **Comprehensive CV Format**: Provide a detailed, multi-page Curriculum Vitae. Include all relevant past roles, comprehensive bullet points for each, and maintain an exhaustive list of achievements and responsibilities that match the JD keywords. Do not overly truncate the history.";
+  }
+
   const systemPrompt = `You are an expert resume writer and recruiter specializing in ATS (Applicant Tracking System) optimization and human-friendly storytelling.
 Your job is to rewrite a candidate's resume/career history to perfectly align with a target Job Description (JD) and also write a customized cover letter.
 
 Here are the strict guidelines:
 1. **Truthfulness**: Rely ONLY on facts, roles, and achievements present in the provided career history (uploaded CVs). Do NOT invent jobs, companies, credentials, or achievements.
 2. **ATS Optimization**: Identify critical keywords, technical skills, and phrases in the Job Description, and naturally integrate them into the candidate's experience where applicable. **CRITICAL: You MUST aim for a >95% ATS keyword match score. Ruthlessly find organic ways to include as many target keywords as mathematically possible without lying.**
-3. **Strict 2-Page Constraint**: Ensure the resume is highly optimized, concise, and fits strictly within a 2-page ceiling (approximately 500-750 words). Filter out minor or redundant details, and focus on high-impact accomplishments.
+${lengthConstraint}
 4. **Professional Formatting**: Format headings to match the user's specific CV format:
    - The very top of the resume MUST start with the candidate's Name as an H1, immediately followed by the exact Target Job Title (from the JD) as an italicized subtitle on the next line. Like this:
      # [Candidate Name]

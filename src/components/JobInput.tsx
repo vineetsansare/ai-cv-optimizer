@@ -1,12 +1,14 @@
 import React from 'react';
-import { ArrowRight, Briefcase, Target, AlertCircle, FileText } from 'lucide-react';
-import type { LLMConfig } from '../utils/llm';
+import { ArrowRight, Briefcase, Target, AlertCircle, FileText, FileDown } from 'lucide-react';
+import type { LLMConfig, TargetLength } from '../utils/llm';
 
 interface JobInputProps {
   jobDescription: string;
   onChangeJobDescription: (jd: string) => void;
   aspirations: string;
   onChangeAspirations: (asp: string) => void;
+  targetLength: TargetLength;
+  onChangeTargetLength: (len: TargetLength) => void;
   config: LLMConfig;
   contextCVs: { name: string; text: string }[];
   activeCVIndices: number[];
@@ -20,6 +22,8 @@ export const JobInput: React.FC<JobInputProps> = ({
   onChangeJobDescription,
   aspirations,
   onChangeAspirations,
+  targetLength,
+  onChangeTargetLength,
   config,
   contextCVs,
   activeCVIndices,
@@ -74,18 +78,46 @@ export const JobInput: React.FC<JobInputProps> = ({
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="aspirations" className="flex-row-gap">
-          <Target size={14} className="text-accent-mint" />
-          <span>Future Aspirations / Focus (Optional)</span>
-        </label>
-        <input
-          id="aspirations"
-          type="text"
-          placeholder="e.g. Focus on Tech Lead aspects; highlight my remote work experience; prioritize React/Node stack."
-          value={aspirations}
-          onChange={(e) => onChangeAspirations(e.target.value)}
-        />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+        <div className="form-group">
+          <label htmlFor="aspirations" className="flex-row-gap">
+            <Target size={14} className="text-accent-mint" />
+            <span>Future Aspirations / Focus (Optional)</span>
+          </label>
+          <input
+            id="aspirations"
+            type="text"
+            placeholder="e.g. Focus on Tech Lead aspects; prioritize React stack."
+            value={aspirations}
+            onChange={(e) => onChangeAspirations(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="target-length" className="flex-row-gap">
+            <FileDown size={14} className="text-accent-mint" />
+            <span>Output Format & Length</span>
+          </label>
+          <select
+            id="target-length"
+            value={targetLength}
+            onChange={(e) => onChangeTargetLength(e.target.value as TargetLength)}
+            style={{
+              padding: '0.65rem 1rem',
+              borderRadius: 'var(--border-radius-md)',
+              border: '1px solid var(--card-border)',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              fontSize: '0.9rem',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="1-page">1-Page Resume (Aggressive truncation)</option>
+            <option value="2-page">2-Page Resume (Standard formatting)</option>
+            <option value="comprehensive">Comprehensive CV (Exhaustive history)</option>
+          </select>
+        </div>
       </div>
 
       {contextCVs.length > 0 && (
