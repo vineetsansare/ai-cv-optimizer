@@ -122,11 +122,11 @@ BEGIN
         new.email,
         COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
         new.raw_user_meta_data->>'avatar_url',
-        'free'::user_plan
+        'free'::public.user_plan
     );
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Trigger assignment
 CREATE TRIGGER on_auth_user_created
