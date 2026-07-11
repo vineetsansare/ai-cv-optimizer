@@ -282,6 +282,7 @@ label {
 
 input[type="text"],
 input[type="password"],
+input[type="email"],
 select,
 textarea {
   background: var(--bg-primary);
@@ -297,6 +298,7 @@ textarea {
 
 input[type="text"]:focus,
 input[type="password"]:focus,
+input[type="email"]:focus,
 select:focus,
 textarea:focus {
   border-color: var(--accent-primary);
@@ -306,6 +308,7 @@ textarea:focus {
 
 .dark-theme input[type="text"]:focus,
 .dark-theme input[type="password"]:focus,
+.dark-theme input[type="email"]:focus,
 .dark-theme select:focus,
 .dark-theme textarea:focus {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);

@@ -45,7 +45,18 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         onSuccess();
       }
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+      console.error('Auth error detail:', err);
+      let errMsg = 'Authentication failed';
+      if (err && typeof err === 'object') {
+        errMsg = err.message || JSON.stringify(err);
+      } else if (typeof err === 'string') {
+        errMsg = err;
+      }
+      
+      if (errMsg === '{}') {
+        errMsg = 'Failed to connect to Supabase. Please ensure your Supabase URL and Anon Key are correct.';
+      }
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
