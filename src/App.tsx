@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { SettingsPanel } from './components/SettingsPanel';
 import { JobInput } from './components/JobInput';
 import { CVDisplay } from './components/CVDisplay';
+import { AuthForm } from './components/AuthForm';
 import { generateCustomizedCV, autoFixCV } from './utils/llm';
 import type { LLMConfig, CVGenerationResult, TargetLength } from './utils/llm';
-import { AlertCircle, Sparkles, Wand2, Sun, Moon } from 'lucide-react';
+import { Sparkles, Sun, Moon, ShieldCheck, AlertCircle } from 'lucide-react';
+import { supabase } from './utils/supabase';
 
 const LOCAL_STORAGE_KEY_CONFIG = 'cv_builder_llm_config';
-const LOCAL_STORAGE_KEY_CVS = 'cv_builder_context_cvs';
 const LOCAL_STORAGE_KEY_THEME = 'cv_builder_theme';
 const LOCAL_STORAGE_KEY_SIDEBAR = 'cv_builder_sidebar_collapsed';
 
@@ -17,15 +18,32 @@ const DEFAULT_CONFIG: LLMConfig = {
   model: 'gemini-2.5-flash',
 };
 
+interface CloudCV {
+  id?: string;
+  name: string;
+  text: string;
+}
+
+interface UserProfile {
+  email: string;
+  full_name?: string;
+  plan: 'free' | 'byok' | 'pro';
+  generation_count: number;
+}
+
 function App() {
+  const [session, setSession] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [config, setConfig] = useState<LLMConfig>(DEFAULT_CONFIG);
-  const [contextCVs, setContextCVs] = useState<{ name: string; text: string }[]>([]);
+  const [contextCVs, setContextCVs] = useState<CloudCV[]>([]);
   const [activeCVIndices, setActiveCVIndices] = useState<number[]>([]);
   const [jobDescription, setJobDescription] = useState('');
   const [aspirations, setAspirations] = useState('');
   const [targetLength, setTargetLength] = useState<TargetLength>('2-page');
   
-  // Theme & Sidebar States (Iteration 2)
+  // Theme & Sidebar States
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -36,7 +54,89 @@ function App() {
   const [result, setResult] = useState<CVGenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load configuration, CVs, theme, and sidebar state from localStorage on mount
+  // 1. Auth Subscription & Session Setup
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        loadUserData(session);
+      } else {
+        setAuthLoading(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        loadUserData(session);
+      } else {
+        setUserProfile(null);
+        setContextCVs([]);
+        setActiveCVIndices([]);
+        setAuthLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // 2. Fetch user profile and CVs from Supabase
+  const loadUserData = async (currentSession: any) => {
+    setAuthLoading(true);
+    try {
+      // Fetch or wait for profile trigger
+      let profile = null;
+      let retryCount = 0;
+
+      while (retryCount < 5) {
+        const { data, error: _error } = await supabase
+          .from('profiles')
+          .select('email, full_name, plan, generation_count')
+          .eq('id', currentSession.user.id)
+          .maybeSingle();
+
+        if (data) {
+          profile = data;
+          break;
+        }
+
+        // Wait 1s and retry if trigger hasn't fired yet
+        await new Promise(res => setTimeout(res, 1000));
+        retryCount++;
+      }
+
+      if (profile) {
+        setUserProfile({
+          email: profile.email,
+          full_name: profile.full_name,
+          plan: profile.plan as 'free' | 'byok' | 'pro',
+          generation_count: profile.generation_count || 0
+        });
+      }
+
+      // Fetch user's saved CVs
+      const { data: cvs, error: _cvError } = await supabase
+        .from('cv_documents')
+        .select('id, filename, extracted_text')
+        .eq('user_id', currentSession.user.id);
+
+      if (cvs && !_cvError) {
+        const mappedCVs = cvs.map(c => ({
+          id: c.id,
+          name: c.filename,
+          text: c.extracted_text
+        }));
+        setContextCVs(mappedCVs);
+        setActiveCVIndices(mappedCVs.map((_, idx) => idx));
+      }
+    } catch (err) {
+      console.error('Error loading session data:', err);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // 3. Load configurations & theme from localStorage
   useEffect(() => {
     const savedConfig = localStorage.getItem(LOCAL_STORAGE_KEY_CONFIG);
     if (savedConfig) {
@@ -47,18 +147,6 @@ function App() {
       }
     }
 
-    const savedCVs = localStorage.getItem(LOCAL_STORAGE_KEY_CVS);
-    if (savedCVs) {
-      try {
-        const parsed = JSON.parse(savedCVs);
-        setContextCVs(parsed);
-        setActiveCVIndices(parsed.map((_: any, idx: number) => idx));
-      } catch (e) {
-        console.error('Error loading CVs from localStorage', e);
-      }
-    }
-
-    // Load Theme (Default: light)
     const savedTheme = localStorage.getItem(LOCAL_STORAGE_KEY_THEME) as 'light' | 'dark' | null;
     if (savedTheme) {
       setTheme(savedTheme);
@@ -67,7 +155,6 @@ function App() {
       applyTheme('light');
     }
 
-    // Load Sidebar Collapse State
     const savedSidebar = localStorage.getItem(LOCAL_STORAGE_KEY_SIDEBAR);
     if (savedSidebar) {
       setSidebarCollapsed(JSON.parse(savedSidebar));
@@ -96,34 +183,64 @@ function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY_SIDEBAR, JSON.stringify(nextState));
   };
 
-  // Update localStorage when config changes
   const handleConfigChange = (newConfig: LLMConfig) => {
     setConfig(newConfig);
     localStorage.setItem(LOCAL_STORAGE_KEY_CONFIG, JSON.stringify(newConfig));
   };
 
-  // Add a parsed CV to context
-  const handleAddCV = (name: string, text: string) => {
-    const updatedCVs = [...contextCVs, { name, text }];
-    setContextCVs(updatedCVs);
-    localStorage.setItem(LOCAL_STORAGE_KEY_CVS, JSON.stringify(updatedCVs));
-    setActiveCVIndices([...activeCVIndices, updatedCVs.length - 1]);
+  // Add CV to Supabase Database
+  const handleAddCV = async (name: string, text: string) => {
+    if (!session) return;
+    try {
+      const { data, error } = await supabase
+        .from('cv_documents')
+        .insert({
+          user_id: session.user.id,
+          filename: name,
+          extracted_text: text
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newCV = { id: data.id, name, text };
+      const updatedCVs = [...contextCVs, newCV];
+      setContextCVs(updatedCVs);
+      setActiveCVIndices([...activeCVIndices, updatedCVs.length - 1]);
+    } catch (err: any) {
+      console.error('Failed to save CV to cloud:', err);
+      setError('Failed to upload CV to database.');
+    }
   };
 
-  // Remove a CV from context
-  const handleRemoveCV = (indexToRemove: number) => {
-    const updatedCVs = contextCVs.filter((_, idx) => idx !== indexToRemove);
-    setContextCVs(updatedCVs);
-    localStorage.setItem(LOCAL_STORAGE_KEY_CVS, JSON.stringify(updatedCVs));
+  // Remove CV from Supabase Database
+  const handleRemoveCV = async (indexToRemove: number) => {
+    const cvToRemove = contextCVs[indexToRemove];
+    if (!cvToRemove || !session) return;
 
-    // Update active indices
-    const updatedActive = activeCVIndices
-      .filter((idx) => idx !== indexToRemove)
-      .map((idx) => (idx > indexToRemove ? idx - 1 : idx));
-    setActiveCVIndices(updatedActive);
+    try {
+      if (cvToRemove.id) {
+        const { error } = await supabase
+          .from('cv_documents')
+          .delete()
+          .eq('id', cvToRemove.id);
+        if (error) throw error;
+      }
+
+      const updatedCVs = contextCVs.filter((_, idx) => idx !== indexToRemove);
+      setContextCVs(updatedCVs);
+
+      const updatedActive = activeCVIndices
+        .filter((idx) => idx !== indexToRemove)
+        .map((idx) => (idx > indexToRemove ? idx - 1 : idx));
+      setActiveCVIndices(updatedActive);
+    } catch (err) {
+      console.error('Failed to delete CV from cloud:', err);
+      setError('Failed to delete CV from database.');
+    }
   };
 
-  // Toggle CV inclusion
   const handleToggleCVIndex = (index: number) => {
     if (activeCVIndices.includes(index)) {
       setActiveCVIndices(activeCVIndices.filter((idx) => idx !== index));
@@ -132,7 +249,6 @@ function App() {
     }
   };
 
-  // Trigger loader step text changes
   useEffect(() => {
     let interval: any;
     if (generating) {
@@ -145,7 +261,6 @@ function App() {
     return () => clearInterval(interval);
   }, [generating]);
 
-  // Execute CV generation
   const handleGenerate = async () => {
     if (activeCVIndices.length === 0) {
       setError('Please select at least one CV from the context checkboxes to use as career history.');
@@ -161,10 +276,15 @@ function App() {
     try {
       const cvResult = await generateCustomizedCV(config, activeCVs, jobDescription, aspirations, targetLength, abortControllerRef.current.signal);
       setResult(cvResult);
+      
+      // Update local quota count if free user
+      if (userProfile && userProfile.plan === 'free') {
+        setUserProfile(prev => prev ? { ...prev, generation_count: prev.generation_count + 1 } : null);
+      }
     } catch (err: any) {
       if (err.name === 'AbortError') {
         console.log('CV generation cancelled by user.');
-        return; // Don't show error if cancelled intentionally
+        return;
       }
       console.error(err);
       setError(err.message || 'An unexpected error occurred while communicating with the LLM API.');
@@ -185,10 +305,14 @@ function App() {
     try {
       const fixedResult = await autoFixCV(config, result.cvMarkdown, jobDescription, result.atsAnalysis, abortControllerRef.current.signal);
       setResult(fixedResult);
+
+      if (userProfile && userProfile.plan === 'free') {
+        setUserProfile(prev => prev ? { ...prev, generation_count: prev.generation_count + 1 } : null);
+      }
     } catch (err: any) {
       if (err.name === 'AbortError') {
         console.log('Auto-fix cancelled by user.');
-        return; // Don't show error if cancelled intentionally
+        return;
       }
       console.error(err);
       setError(err.message || 'An unexpected error occurred while auto-fixing with the LLM API.');
@@ -214,7 +338,10 @@ function App() {
     }
   };
 
-  // Loading animation step messages
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   const getLoaderText = () => {
     if (isAutoFixing) {
       switch (genStep) {
@@ -235,6 +362,43 @@ function App() {
     }
   };
 
+  // 4. Loading States
+  if (authLoading && !session) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', width: '100vw', justifyContent: 'center', alignItems: 'center', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+          <div className="radar-spinner" style={{ width: '48px', height: '48px', border: '3px solid var(--card-border)', borderTopColor: 'var(--accent-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Initializing secure environment...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // 5. Auth Wall
+  if (!session) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        height: '100vh', 
+        width: '100vw', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        background: 'radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-primary) 100%)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Apple-like soft backlighting */}
+        <div style={{ position: 'absolute', top: '10%', left: '20%', width: '400px', height: '400px', background: 'rgba(99, 102, 241, 0.1)', filter: 'blur(100px)', borderRadius: '50%' }}></div>
+        <div style={{ position: 'absolute', bottom: '10%', right: '20%', width: '400px', height: '400px', background: 'rgba(16, 185, 129, 0.08)', filter: 'blur(100px)', borderRadius: '50%' }}></div>
+        
+        <AuthForm onSuccess={() => {}} />
+      </div>
+    );
+  }
+
+  const loaderText = getLoaderText();
+
+  // 6. Logged In Main App
   return (
     <div className={`app-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <SettingsPanel
@@ -245,118 +409,104 @@ function App() {
         onRemoveCV={handleRemoveCV}
         collapsed={sidebarCollapsed}
         onToggleCollapse={handleSidebarToggle}
+        userProfile={userProfile}
+        onLogout={handleLogout}
       />
 
       <main className="main-content">
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <h1>Antigravity CV Optimizer</h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem' }}>
-              Instantly customize your career history to fit any job opening with perfect ATS styling.
-            </p>
+        <header className="app-header">
+          <div className="flex-row-gap">
+            <Sparkles className="text-accent-primary" size={24} />
+            <div>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Antigravity CV Optimizer</h1>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>
+                Instantly customize your career history to fit any job opening with perfect ATS styling.
+              </p>
+            </div>
           </div>
           
           <div className="flex-row-gap">
+            <div className="privacy-badge">
+              <ShieldCheck size={14} className="text-accent-secondary" />
+              <span>100% Client-Side & Private</span>
+            </div>
+            
             <button
               type="button"
-              className="theme-toggle-header-btn"
+              className="theme-toggle"
               onClick={handleThemeToggle}
-              title={theme === 'light' ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
             >
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
-            <div className="flex-row-gap" style={{ background: 'var(--bg-tertiary)', padding: '0.4rem 0.8rem', borderRadius: '999px', fontSize: '0.85rem', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}>
-              <Sparkles size={14} style={{ color: 'var(--accent-primary)' }} />
-              <span>100% Client-Side & Private</span>
-            </div>
           </div>
         </header>
 
-        {error && (
-          <div className="glass-card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(255, 59, 48, 0.05)', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-            <AlertCircle size={24} style={{ color: 'var(--danger)', flexShrink: 0 }} />
-            <div>
-              <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Generation Failed</h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{error}</p>
-            </div>
-          </div>
-        )}
-
-        {!generating && !result && (
-          <div className="glass-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '0.5rem' }}>
-            <div>
-              <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>1</span>
-                Configure Provider & Keys
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                Enter your Google Gemini API key in the left panel. Gemini models run directly in the browser with zero server latency or middleware tracking.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>2</span>
-                Upload Your Profiles
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                Upload one or multiple resumes (.pdf, .txt, or .md format). The tool reads experience bullet points across files to establish a rich context library.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>3</span>
-                Input Job Details & Run
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                Paste the target job description and hit the generate button. The AI will output an ATS-optimized, beautifully styled Markdown resume ready to print as PDF!
-              </p>
-            </div>
-          </div>
-        )}
-
-        <JobInput
-          jobDescription={jobDescription}
-          onChangeJobDescription={setJobDescription}
-          aspirations={aspirations}
-          onChangeAspirations={setAspirations}
-          targetLength={targetLength}
-          onChangeTargetLength={setTargetLength}
-          config={config}
-          contextCVs={contextCVs}
-          activeCVIndices={activeCVIndices}
-          onToggleCVIndex={handleToggleCVIndex}
-          onGenerate={handleGenerate}
-          generating={generating}
-        />
-
         {generating && (
-          <div className="glass-card scanner-container">
-            <div className="radar-sweep">
-              <div className="radar-scan-line"></div>
+          <div className="scanner-container">
+            <div className="scanner-radar">
+              <div className="scanner-line"></div>
               <div className="radar-grid"></div>
-              <Wand2 size={36} style={{ zIndex: 10, color: 'var(--accent-primary)' }} />
             </div>
-            <div className="scanner-text">{getLoaderText().title}</div>
-            <div className="scanner-subtext">{getLoaderText().desc}</div>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleCancel}
-              style={{ marginTop: '1.5rem', width: 'auto', padding: '0.5rem 1.5rem', background: 'rgba(255,59,48,0.1)', color: 'var(--danger)', borderColor: 'rgba(255,59,48,0.2)' }}
-            >
+            <div className="scanner-text">{loaderText.title}</div>
+            <div className="scanner-subtext">{loaderText.desc}</div>
+            <button type="button" className="btn" onClick={handleCancel} style={{ marginTop: '1.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444' }}>
               Cancel Request
             </button>
           </div>
         )}
 
-        {!generating && result && (
-          <CVDisplay
-            result={result}
-            onUpdateMarkdown={handleUpdateMarkdown}
-            onAutoFix={handleAutoFix}
-          />
+        {!generating && !result && (
+          <div className="onboarding-grid" style={{ marginBottom: '1.5rem' }}>
+            <div className="onboarding-card">
+              <div className="step-num">1</div>
+              <h3>Configure Provider & Keys</h3>
+              <p>Enter your Google Gemini API key in the left panel. Gemini models run directly in the browser with zero server latency or middleware tracking.</p>
+            </div>
+            <div className="onboarding-card">
+              <div className="step-num">2</div>
+              <h3>Upload Your Profiles</h3>
+              <p>Upload one or multiple resumes (.pdf, .txt, or .md format). The tool reads experience bullet points across files to establish a rich context library.</p>
+            </div>
+            <div className="onboarding-card">
+              <div className="step-num">3</div>
+              <h3>Input Job Details & Run</h3>
+              <p>Paste the target job description and hit the generate button. The AI will output an ATS-optimized, beautifully styled Markdown resume ready to print as PDF!</p>
+            </div>
+          </div>
+        )}
+
+        {!generating && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {error && (
+              <div className="flex-row-gap" style={{ color: 'var(--danger)', fontSize: '0.85rem', background: 'rgba(255, 59, 48, 0.08)', padding: '0.75rem 1rem', borderRadius: 'var(--border-radius-md)', border: '1px solid rgba(255, 59, 48, 0.15)' }}>
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                <span>{error}</span>
+              </div>
+            )}
+            <JobInput
+              jobDescription={jobDescription}
+              onChangeJobDescription={setJobDescription}
+              aspirations={aspirations}
+              onChangeAspirations={setAspirations}
+              targetLength={targetLength}
+              onChangeTargetLength={setTargetLength}
+              config={config}
+              contextCVs={contextCVs}
+              activeCVIndices={activeCVIndices}
+              onToggleCVIndex={handleToggleCVIndex}
+              onGenerate={handleGenerate}
+              generating={generating}
+            />
+
+            {result && (
+              <CVDisplay
+                result={result}
+                onUpdateMarkdown={handleUpdateMarkdown}
+                onAutoFix={handleAutoFix}
+              />
+            )}
+          </div>
         )}
       </main>
     </div>
