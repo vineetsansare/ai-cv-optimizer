@@ -57,7 +57,7 @@ export const JobInput: React.FC<JobInputProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <form onSubmit={handleSubmit} className="glass-card job-input-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       <div className="glass-card-header">
         <div className="flex-row-gap">
           <Briefcase size={20} className="text-accent-mint" />

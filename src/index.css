@@ -1040,12 +1040,14 @@ textarea {
   }
   
   .sidebar,
-  .main-content > *:not(.cv-display-card),
-  .cv-display-card > *:not(.cv-display-content),
+  .app-header,
+  .job-input-form,
+  .scanner-container,
+  .cv-display-header,
   .tabs-container,
+  .sidebar-toggle-btn,
   .cv-display-content > *:not(.print-pane),
-  .print-pane > *:not(.resume-preview-sheet),
-  .sidebar-toggle-btn {
+  .print-pane > *:not(.resume-preview-sheet) {
     display: none !important;
   }
   
