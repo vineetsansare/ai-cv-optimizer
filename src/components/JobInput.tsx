@@ -15,6 +15,7 @@ interface JobInputProps {
   onToggleCVIndex: (index: number) => void;
   onGenerate: () => void;
   generating: boolean;
+  isKeyConfigured: boolean;
 }
 
 export const JobInput: React.FC<JobInputProps> = ({
@@ -24,14 +25,15 @@ export const JobInput: React.FC<JobInputProps> = ({
   onChangeAspirations,
   targetLength,
   onChangeTargetLength,
-  config,
+  config: _config,
   contextCVs,
   activeCVIndices,
   onToggleCVIndex,
   onGenerate,
-  generating
+  generating,
+  isKeyConfigured
 }) => {
-  const isKeyMissing = !config.apiKey.trim();
+  const isKeyMissing = !isKeyConfigured;
   const isCVMissing = contextCVs.length === 0;
   const isJDMissing = !jobDescription.trim();
   const isCVSelectedMissing = activeCVIndices.length === 0;

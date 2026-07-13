@@ -265,8 +265,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 <label htmlFor="llm-provider">Provider</label>
                 <select
                   id="llm-provider"
-                  value={config.provider}
+                  value={userProfile?.plan === 'free' ? 'gemini' : config.provider}
                   onChange={handleProviderChange}
+                  disabled={userProfile?.plan === 'free'}
                 >
                   <option value="gemini">Google Gemini</option>
                   <option value="openai">OpenAI</option>
@@ -278,15 +279,26 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 <label htmlFor="llm-model">Model</label>
                 <select
                   id="llm-model"
-                  value={config.model}
+                  value={userProfile?.plan === 'free' ? 'gemini-3.5-flash' : config.model}
                   onChange={handleModelChange}
+                  disabled={userProfile?.plan === 'free'}
                 >
-                  {PROVIDER_MODELS[config.provider].map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
+                  {userProfile?.plan === 'free' ? (
+                    <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                  ) : (
+                    PROVIDER_MODELS[config.provider].map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))
+                  )}
                 </select>
+                {userProfile?.plan === 'free' && (
+                  <div style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', marginTop: '0.4rem', display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                    <ShieldCheck size={12} />
+                    <span>Free plan is locked to Gemini 3.5 Flash.</span>
+                  </div>
+                )}
               </div>
 
               {/* API Key management based on plan */}
@@ -349,7 +361,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               </div>
 
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                Upload resumes. The LLM merges them to extract career evidence for the target job.
+                Upload resumes. The LLM merges them to extract career evidence for the target job. 
+                <strong> (Plan limit: Max {userProfile?.plan === 'free' ? '1' : '5'} CVs)</strong>.
               </p>
 
               <input

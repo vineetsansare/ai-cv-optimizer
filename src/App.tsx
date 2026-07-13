@@ -3,7 +3,7 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { JobInput } from './components/JobInput';
 import { CVDisplay } from './components/CVDisplay';
 import { AuthForm } from './components/AuthForm';
-import { generateCustomizedCV, autoFixCV } from './utils/llm';
+import { generateCustomizedCV, autoFixCV, getSavedAPIKeysStatus } from './utils/llm';
 import type { LLMConfig, CVGenerationResult, TargetLength } from './utils/llm';
 import { Sparkles, Sun, Moon, ShieldCheck, AlertCircle } from 'lucide-react';
 import { supabase } from './utils/supabase';
@@ -36,6 +36,13 @@ function App() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  // Password reset flow states
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
+
   const [config, setConfig] = useState<LLMConfig>(DEFAULT_CONFIG);
   const [contextCVs, setContextCVs] = useState<CloudCV[]>([]);
   const [activeCVIndices, setActiveCVIndices] = useState<number[]>([]);
@@ -54,6 +61,13 @@ function App() {
   const [result, setResult] = useState<CVGenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // BYOK Saved Keys Status
+  const [savedKeys, setSavedKeys] = useState<{ gemini: boolean; openai: boolean; anthropic: boolean }>({
+    gemini: false,
+    openai: false,
+    anthropic: false
+  });
+
   // 1. Auth Subscription & Session Setup
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -65,8 +79,11 @@ function App() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsResettingPassword(true);
+      }
       if (session) {
         loadUserData(session);
       } else {
@@ -84,7 +101,6 @@ function App() {
   const loadUserData = async (currentSession: any) => {
     setAuthLoading(true);
     try {
-      // Fetch or wait for profile trigger
       let profile = null;
       let retryCount = 0;
 
@@ -100,18 +116,30 @@ function App() {
           break;
         }
 
-        // Wait 1s and retry if trigger hasn't fired yet
         await new Promise(res => setTimeout(res, 1000));
         retryCount++;
       }
 
       if (profile) {
+        const plan = profile.plan as 'free' | 'byok' | 'pro';
         setUserProfile({
           email: profile.email,
           full_name: profile.full_name,
-          plan: profile.plan as 'free' | 'byok' | 'pro',
+          plan,
           generation_count: profile.generation_count || 0
         });
+
+        // If free plan, force config to Gemini
+        if (plan === 'free') {
+          setConfig(prev => ({
+            ...prev,
+            provider: 'gemini',
+            model: 'gemini-3.5-flash'
+          }));
+        } else if (plan === 'byok') {
+          // Fetch BYOK key status
+          getSavedAPIKeysStatus().then(setSavedKeys);
+        }
       }
 
       // Fetch user's saved CVs
@@ -191,6 +219,14 @@ function App() {
   // Add CV to Supabase Database
   const handleAddCV = async (name: string, text: string) => {
     if (!session) return;
+    
+    // Upload limit check
+    const limit = userProfile?.plan === 'free' ? 1 : 5;
+    if (contextCVs.length >= limit) {
+      setError(`Your plan (${userProfile?.plan.toUpperCase()}) is limited to maximum ${limit} CV profile(s). Please remove a profile before uploading or upgrade your plan.`);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('cv_documents')
@@ -208,6 +244,7 @@ function App() {
       const updatedCVs = [...contextCVs, newCV];
       setContextCVs(updatedCVs);
       setActiveCVIndices([...activeCVIndices, updatedCVs.length - 1]);
+      setError(null); // Clear errors
     } catch (err: any) {
       console.error('Failed to save CV to cloud:', err);
       setError('Failed to upload CV to database.');
@@ -235,6 +272,7 @@ function App() {
         .filter((idx) => idx !== indexToRemove)
         .map((idx) => (idx > indexToRemove ? idx - 1 : idx));
       setActiveCVIndices(updatedActive);
+      setError(null);
     } catch (err) {
       console.error('Failed to delete CV from cloud:', err);
       setError('Failed to delete CV from database.');
@@ -273,8 +311,13 @@ function App() {
     
     const activeCVs = activeCVIndices.map((idx) => contextCVs[idx]);
 
+    // Force provider to Gemini if free plan
+    const activeConfig = userProfile?.plan === 'free'
+      ? { ...config, provider: 'gemini' as const, model: 'gemini-3.5-flash' }
+      : config;
+
     try {
-      const cvResult = await generateCustomizedCV(config, activeCVs, jobDescription, aspirations, targetLength, abortControllerRef.current.signal);
+      const cvResult = await generateCustomizedCV(activeConfig, activeCVs, jobDescription, aspirations, targetLength, abortControllerRef.current.signal);
       setResult(cvResult);
       
       // Update local quota count if free user
@@ -302,8 +345,12 @@ function App() {
     setError(null);
     abortControllerRef.current = new AbortController();
 
+    const activeConfig = userProfile?.plan === 'free'
+      ? { ...config, provider: 'gemini' as const, model: 'gemini-3.5-flash' }
+      : config;
+
     try {
-      const fixedResult = await autoFixCV(config, result.cvMarkdown, jobDescription, result.atsAnalysis, abortControllerRef.current.signal);
+      const fixedResult = await autoFixCV(activeConfig, result.cvMarkdown, jobDescription, result.atsAnalysis, abortControllerRef.current.signal);
       setResult(fixedResult);
 
       if (userProfile && userProfile.plan === 'free') {
@@ -342,6 +389,26 @@ function App() {
     await supabase.auth.signOut();
   };
 
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetError(null);
+    setResetSuccess(null);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setResetSuccess('Password updated successfully! Redirecting...');
+      setTimeout(() => {
+        setIsResettingPassword(false);
+        setNewPassword('');
+      }, 2000);
+    } catch (err: any) {
+      setResetError(err.message || 'Failed to reset password');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   const getLoaderText = () => {
     if (isAutoFixing) {
       switch (genStep) {
@@ -362,7 +429,71 @@ function App() {
     }
   };
 
-  // 4. Loading States
+  // Determine key configuration status based on user plan
+  const isKeyConfigured = 
+    userProfile?.plan === 'pro' || 
+    userProfile?.plan === 'free' || 
+    (userProfile?.plan === 'byok' && savedKeys[config.provider]);
+
+  // Password reset UI Overlay
+  if (isResettingPassword) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        height: '100vh', 
+        width: '100vw', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        background: 'radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-primary) 100%)',
+        position: 'relative'
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          maxWidth: '400px',
+          padding: '2.5rem',
+          background: 'var(--card-bg)',
+          border: '1px solid var(--card-border)',
+          borderRadius: 'var(--border-radius-lg)',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(20px)'
+        }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-primary)' }}>Set New Password</h2>
+          
+          {resetError && (
+            <div style={{ padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.85rem' }}>
+              {resetError}
+            </div>
+          )}
+          {resetSuccess && (
+            <div style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-mint)', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.85rem' }}>
+              {resetSuccess}
+            </div>
+          )}
+          
+          <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="form-group">
+              <label htmlFor="new-password">New Password</label>
+              <input
+                id="new-password"
+                type="password"
+                required
+                placeholder="Minimum 6 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={resetLoading} style={{ marginTop: '0.5rem' }}>
+              {resetLoading ? 'Updating...' : 'Update Password'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading States
   if (authLoading && !session) {
     return (
       <div style={{ display: 'flex', height: '100vh', width: '100vw', justifyContent: 'center', alignItems: 'center', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
@@ -374,7 +505,7 @@ function App() {
     );
   }
 
-  // 5. Auth Wall
+  // Auth Wall
   if (!session) {
     return (
       <div style={{ 
@@ -387,7 +518,6 @@ function App() {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Apple-like soft backlighting */}
         <div style={{ position: 'absolute', top: '10%', left: '20%', width: '400px', height: '400px', background: 'rgba(99, 102, 241, 0.1)', filter: 'blur(100px)', borderRadius: '50%' }}></div>
         <div style={{ position: 'absolute', bottom: '10%', right: '20%', width: '400px', height: '400px', background: 'rgba(16, 185, 129, 0.08)', filter: 'blur(100px)', borderRadius: '50%' }}></div>
         
@@ -398,7 +528,7 @@ function App() {
 
   const loaderText = getLoaderText();
 
-  // 6. Logged In Main App
+  // Logged In Main App
   return (
     <div className={`app-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <SettingsPanel
@@ -426,7 +556,7 @@ function App() {
           </div>
           
           <div className="flex-row-gap">
-            <div className="privacy-badge">
+            <div className="flex-row-gap" style={{ background: 'var(--bg-tertiary)', padding: '0.4rem 0.8rem', borderRadius: '999px', fontSize: '0.85rem', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}>
               <ShieldCheck size={14} className="text-accent-secondary" />
               <span>100% Client-Side & Private</span>
             </div>
@@ -456,22 +586,37 @@ function App() {
           </div>
         )}
 
+        {/* Restored exact production onboarding cards layout */}
         {!generating && !result && (
-          <div className="onboarding-grid" style={{ marginBottom: '1.5rem' }}>
-            <div className="onboarding-card">
-              <div className="step-num">1</div>
-              <h3>Configure Provider & Keys</h3>
-              <p>Enter your Google Gemini API key in the left panel. Gemini models run directly in the browser with zero server latency or middleware tracking.</p>
+          <div className="glass-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '0.5rem' }}>
+            <div>
+              <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>1</span>
+                Configure Provider & Keys
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Enter your Google Gemini API key in the left panel. Gemini models run directly in the browser with zero server latency or middleware tracking.
+              </p>
             </div>
-            <div className="onboarding-card">
-              <div className="step-num">2</div>
-              <h3>Upload Your Profiles</h3>
-              <p>Upload one or multiple resumes (.pdf, .txt, or .md format). The tool reads experience bullet points across files to establish a rich context library.</p>
+            
+            <div>
+              <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>2</span>
+                Upload Your Profiles
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Upload one or multiple resumes (.pdf, .txt, or .md format). The tool reads experience bullet points across files to establish a rich context library.
+              </p>
             </div>
-            <div className="onboarding-card">
-              <div className="step-num">3</div>
-              <h3>Input Job Details & Run</h3>
-              <p>Paste the target job description and hit the generate button. The AI will output an ATS-optimized, beautifully styled Markdown resume ready to print as PDF!</p>
+
+            <div>
+              <h3 className="flex-row-gap" style={{ marginBottom: '0.75rem' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-primary)', fontSize: '0.8rem', color: '#ffffff' }}>3</span>
+                Input Job Details & Run
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Paste the target job description and hit the generate button. The AI will output an ATS-optimized, beautifully styled Markdown resume ready to print as PDF!
+              </p>
             </div>
           </div>
         )}
@@ -497,6 +642,7 @@ function App() {
               onToggleCVIndex={handleToggleCVIndex}
               onGenerate={handleGenerate}
               generating={generating}
+              isKeyConfigured={isKeyConfigured}
             />
 
             {result && (
