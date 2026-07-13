@@ -213,8 +213,51 @@ async function callAnthropic(config: LLMCallConfig, systemPrompt: string, userPr
       model: config.model,
       max_tokens: 4000,
       system: systemPrompt,
+      tools: [
+        {
+          name: 'submit_customized_cv',
+          description: 'Submit the completed ATS-optimized CV, cover letter, and ATS keyword metrics.',
+          input_schema: {
+            type: 'object',
+            properties: {
+              cvMarkdown: {
+                type: 'string',
+                description: 'The complete customized CV in markdown format.'
+              },
+              atsScore: {
+                type: 'integer',
+                description: 'The calculated ATS score out of 100.'
+              },
+              atsAnalysis: {
+                type: 'object',
+                properties: {
+                  matchedKeywords: { type: 'array', items: { type: 'string' } },
+                  missingKeywords: { type: 'array', items: { type: 'string' } },
+                  strengths: { type: 'array', items: { type: 'string' } },
+                  weaknesses: { type: 'array', items: { type: 'string' } },
+                  actionItems: { type: 'array', items: { type: 'string' } }
+                },
+                required: ['matchedKeywords', 'missingKeywords', 'strengths', 'weaknesses', 'actionItems']
+              },
+              humanFriendlyChanges: {
+                type: 'array',
+                items: { type: 'string' }
+              },
+              coverLetter: {
+                type: 'string',
+                description: 'The customized cover letter targeted to the JD.'
+              }
+            },
+            required: ['cvMarkdown', 'atsScore', 'atsAnalysis', 'humanFriendlyChanges', 'coverLetter']
+          }
+        }
+      ],
+      tool_choice: {
+        type: 'tool',
+        name: 'submit_customized_cv'
+      },
       messages: [
-        { role: 'user', content: userPrompt + '\nIMPORTANT: You must output ONLY a valid JSON object, with no conversational preamble or postamble. The JSON must match this structure: { "cvMarkdown": "...", "atsScore": 85, "atsAnalysis": { "matchedKeywords": [], "missingKeywords": [], "strengths": [], "weaknesses": [], "actionItems": [] }, "humanFriendlyChanges": [], "coverLetter": "..." }' }
+        { role: 'user', content: userPrompt }
       ]
     })
   });
@@ -225,11 +268,50 @@ async function callAnthropic(config: LLMCallConfig, systemPrompt: string, userPr
   }
 
   const data = await response.json();
+
+  // Try extracting output from tool_use block first (guarantees valid JSON structure from Anthropic)
+  const toolUseBlock = data.content?.find((block: any) => block.type === 'tool_use');
+  if (toolUseBlock && toolUseBlock.input) {
+    return toolUseBlock.input as CVGenerationResult;
+  }
+
+  // Fallback to text block parsing if tool_use was somehow bypassed
   const textBlock = data.content?.find((block: any) => block.type === 'text');
   const content = textBlock?.text;
   if (!content) {
     throw new Error('Empty response from Anthropic API.');
   }
 
-  return JSON.parse(content) as CVGenerationResult;
+  return resilientParseJSON<CVGenerationResult>(content);
+}
+
+function resilientParseJSON<T>(text: string): T {
+  let cleaned = text.trim();
+  
+  // Strip markdown code block wrappers if present
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*/i, '');
+    cleaned = cleaned.replace(/\s*```$/, '');
+    cleaned = cleaned.trim();
+  }
+
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch (firstErr) {
+    // Attempt parsing by isolating the outermost JSON brackets
+    const startIdx = cleaned.indexOf('{');
+    const endIdx = cleaned.lastIndexOf('}');
+    
+    if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+      const rawJson = cleaned.substring(startIdx, endIdx + 1);
+      try {
+        return JSON.parse(rawJson) as T;
+      } catch (secondErr) {
+        console.error('Failed to parse extracted JSON substring. Raw response:', cleaned);
+        throw new Error(`JSON parsing failed: ${(secondErr as Error).message}.`);
+      }
+    }
+    
+    throw firstErr;
+  }
 }
