@@ -225,7 +225,8 @@ async function callAnthropic(config: LLMCallConfig, systemPrompt: string, userPr
   }
 
   const data = await response.json();
-  const content = data.content?.[0]?.text;
+  const textBlock = data.content?.find((block: any) => block.type === 'text');
+  const content = textBlock?.text;
   if (!content) {
     throw new Error('Empty response from Anthropic API.');
   }
