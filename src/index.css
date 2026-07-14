@@ -1,38 +1,38 @@
-/* Import Inter and Outfit fonts from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+/* Import Inter and Geist fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
 
 :root {
-  /* Apple-Inspired Light Mode (Liquid Glass) */
-  --bg-primary: #f5f5f7;
-  --bg-secondary: rgba(255, 255, 255, 0.65);
-  --bg-tertiary: rgba(255, 255, 255, 0.4);
+  /* Aurora Design System - Light Mode */
+  --bg-primary: #faf8ff;
+  --bg-secondary: #f2f3ff;
+  --bg-tertiary: #eaedff;
   
-  --card-bg: rgba(255, 255, 255, 0.65);
-  --card-border: rgba(255, 255, 255, 0.5);
-  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --card-bg: #ffffff;
+  --card-border: rgba(195, 198, 215, 0.3);
+  --card-shadow: 0 4px 32px -4px rgba(19, 27, 46, 0.06);
   
-  --text-primary: #1d1d1f;
-  --text-secondary: #6e6e73;
-  --text-muted: #86868b;
+  --text-primary: #131b2e;
+  --text-secondary: #434655;
+  --text-muted: #737686;
   
-  --accent-primary: #0071e3; /* Apple Blue */
-  --accent-primary-hover: #0077ed;
-  --accent-secondary: #34c759; /* Apple Green */
-  --accent-secondary-hover: #28a745;
-  --accent-accent: #5856d6; /* Purple */
+  --accent-primary: #2563eb; /* Aurora Royal Blue */
+  --accent-primary-hover: #1d4ed8;
+  --accent-secondary: #7c3aed; /* Aurora AI Accent Violet */
+  --accent-secondary-hover: #6d28d9;
+  --accent-accent: #bc4800; /* Aurora Tertiary Orange */
   
-  --danger: #ff3b30; /* Apple Red */
-  --danger-hover: #e02d23;
-  --warning: #ff9500; /* Apple Orange */
+  --danger: #ba1a1a;
+  --danger-hover: #93000a;
+  --warning: #943700;
   
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Outfit', sans-serif;
+  --font-heading: 'Geist', sans-serif;
   --font-mono: 'Fira Code', monospace;
   
-  --border-radius-sm: 6px;
-  --border-radius-md: 10px;
-  --border-radius-lg: 14px;
-  --border-radius-xl: 18px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px; /* For buttons, input fields, chips */
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px; /* For primary containers and cards */
   
   font-family: var(--font-sans);
   color-scheme: light;
@@ -1081,3 +1081,144 @@ textarea {
     margin: 12mm;
   }
 }
+
+/* Stitch Redesign Custom Aurora System Classes */
+.glass-header {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.dark-theme .glass-header {
+  background: rgba(11, 15, 25, 0.8);
+}
+
+.custom-shadow {
+  box-shadow: 0 4px 32px -4px rgba(19, 27, 46, 0.06);
+}
+
+.dark-theme .custom-shadow {
+  box-shadow: 0 4px 32px -4px rgba(0, 0, 0, 0.35);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.85s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.onboarding-card-redesign {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--card-shadow);
+  transition: border-color 0.2s, background-color 0.2s;
+  cursor: pointer;
+}
+
+.onboarding-card-redesign:hover {
+  border-color: rgba(37, 99, 235, 0.4);
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.stepper-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.stepper-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 1rem;
+}
+
+.stepper-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stepper-step.active {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.stepper-step.completed {
+  color: var(--text-primary);
+}
+
+.stepper-step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.stepper-step.active .stepper-step-number {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+}
+
+.stepper-step.completed .stepper-step-number {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Rich table styling */
+.saas-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.saas-table th {
+  padding: 1rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.saas-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.saas-table tbody tr {
+  transition: background-color 0.15s;
+}
+
+.saas-table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Flex layout spacing helpers */
+.gap-xs { gap: 0.5rem; }
+.gap-sm { gap: 1rem; }
+.gap-md { gap: 1.5rem; }
+.gap-lg { gap: 2rem; }
+
