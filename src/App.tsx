@@ -1135,7 +1135,7 @@ function App() {
     if (result) {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="entrance-fade">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="no-print">
             <div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>Optimized Resume Result</h2>
               <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>Review matching keywords, edit markdown, or export PDF.</p>
@@ -1374,7 +1374,7 @@ function App() {
 
     return (
       <div className="glass-card font-body-md entrance-fade" style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem', marginBottom: '2rem' }} className="no-print">
           <div className={`stepper-step ${customizerStep >= 1 ? 'completed' : ''} ${customizerStep === 1 ? 'active' : ''}`}>
             <span className="stepper-step-number">1</span>
             <span className="font-label-sm">Select Profiles</span>
@@ -1596,7 +1596,7 @@ function App() {
         )}
 
         {customizerStep === 5 && !generating && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--card-border)', paddingTop: '1.25rem', marginTop: '2.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--card-border)', paddingTop: '1.25rem', marginTop: '2.5rem' }} className="no-print">
             <button 
               type="button" 
               className="btn btn-secondary" 

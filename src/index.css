@@ -1084,6 +1084,8 @@ textarea {
   
   .sidebar,
   .app-header,
+  .top-header,
+  .no-print,
   .job-input-form,
   .scanner-container,
   .cv-display-header,
@@ -1094,6 +1096,12 @@ textarea {
     display: none !important;
   }
   
+  .main-layout {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+    min-height: 0 !important;
+  }
+
   .main-content {
     padding: 0 !important;
     margin: 0 !important;
