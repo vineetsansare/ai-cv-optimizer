@@ -1265,3 +1265,15 @@ textarea {
 .gap-md { gap: 1.5rem; }
 .gap-lg { gap: 2rem; }
 
+/* Responsive split columns for Quick Optimize */
+@media (max-width: 900px) {
+  .responsive-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+@media (max-width: 600px) {
+  .responsive-fields {
+    grid-template-columns: 1fr !important;
+  }
+}
+

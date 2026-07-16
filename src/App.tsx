@@ -10,7 +10,7 @@ import {
   LayoutDashboard, FileText, Briefcase, BarChart3,
   Settings, LogOut, ChevronLeft, ChevronRight,
   Upload, Plus, Download, Trash2,
-  Copy, Search, ArrowRight, Zap
+  Copy, Search, ArrowRight, Zap, ArrowLeft
 } from 'lucide-react';
 import { supabase } from './utils/supabase';
 
@@ -59,7 +59,7 @@ function App() {
   // Theme & Layout States
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState<'workspace' | 'resumes' | 'applications' | 'reports' | 'settings'>('workspace');
+  const [activeTab, setActiveTab] = useState<'workspace' | 'quick-optimize' | 'resumes' | 'applications' | 'reports' | 'settings'>('workspace');
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [customizerStep, setCustomizerStep] = useState(1);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -627,7 +627,16 @@ function App() {
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
             >
               <LayoutDashboard size={18} />
-              {!sidebarCollapsed && <span className="font-label-sm">Workspace</span>}
+              {!sidebarCollapsed && <span className="font-label-sm">Dashboard</span>}
+            </button>
+
+            <button 
+              className={`tab ${activeTab === 'quick-optimize' && !isCustomizing ? 'active' : ''}`} 
+              onClick={() => { setActiveTab('quick-optimize'); setIsCustomizing(false); }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <Sparkles size={18} style={{ color: 'var(--accent-secondary)' }} />
+              {!sidebarCollapsed && <span className="font-label-sm">Quick Optimize</span>}
             </button>
 
             <button 
@@ -1099,6 +1108,264 @@ function App() {
     );
   };
 
+  const renderQuickOptimizeTab = () => {
+    const isCVMissing = contextCVs.length === 0;
+    const isJDMissing = !jobDescription.trim();
+    const isCVSelectedMissing = activeCVIndices.length === 0;
+    const canSubmit = !isCVMissing && !isJDMissing && !isCVSelectedMissing && !generating && isKeyConfigured;
+
+    if (generating) {
+      return (
+        <div className="glass-card font-body-md entrance-fade" style={{ maxWidth: '900px', margin: '2rem auto', padding: '3rem 2rem' }}>
+          <div className="scanner-container">
+            <div className="radar-sweep">
+              <div className="radar-scan-line"></div>
+              <div className="radar-grid"></div>
+            </div>
+            <div className="scanner-text">{loaderText.title}</div>
+            <div className="scanner-subtext">{loaderText.desc}</div>
+            <button type="button" className="btn btn-secondary" onClick={handleCancel} style={{ width: 'auto', marginTop: '1.5rem', color: 'var(--danger)' }}>
+              Cancel Customization
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (result) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="entrance-fade">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>Optimized Resume Result</h2>
+              <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>Review matching keywords, edit markdown, or export PDF.</p>
+            </div>
+            <button 
+              type="button" 
+              className="btn btn-secondary" 
+              onClick={() => setResult(null)}
+              style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              <ArrowLeft size={16} />
+              <span>Customize Another</span>
+            </button>
+          </div>
+          <CVDisplay
+            result={result}
+            onUpdateMarkdown={handleUpdateMarkdown}
+            onAutoFix={handleAutoFix}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="entrance-fade" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {/* Header Section */}
+        <div>
+          <h2 style={{ fontSize: '2.1rem', margin: 0, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+            Instant CV Customizer
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.95rem' }}>
+            Instantly align your career history to fit any job opening with perfect ATS styling.
+          </p>
+        </div>
+
+        {/* 1-2-3 Instruction Steps */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem' }}>
+          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', background: 'var(--card-bg)' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
+            <div>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Select Profiles</h4>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Check the resumes in the left column to provide your career history context.</p>
+            </div>
+          </div>
+          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', background: 'var(--card-bg)' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
+            <div>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Paste Target JD</h4>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Paste the full text of the job description you are applying for.</p>
+            </div>
+          </div>
+          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', background: 'var(--card-bg)' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
+            <div>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Run AI Customizer</h4>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Set target length or focus area, and hit generate to output optimized resume.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Split Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', alignItems: 'flex-start' }} className="responsive-split">
+          
+          {/* Left Checkbox List & Quick Upload */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="glass-card" style={{ padding: '1.5rem', background: 'var(--card-bg)' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={16} />
+                <span>1. Select Resumes ({activeCVIndices.length})</span>
+              </h3>
+
+              {/* Upload Dropzone */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label className="saas-upload-dropzone" style={{ padding: '1rem 0.5rem', minHeight: '100px', cursor: 'pointer' }}>
+                  <input 
+                    type="file" 
+                    accept=".pdf,.txt,.md" 
+                    onChange={handleFileUpload} 
+                    style={{ display: 'none' }} 
+                    multiple 
+                  />
+                  <Upload size={20} style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }} />
+                  <span style={{ fontSize: '11px', fontWeight: 600, display: 'block' }}>Upload Resume Profile</span>
+                  <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>PDF, TXT, MD up to 10MB</span>
+                </label>
+              </div>
+
+              {/* Checkboxes */}
+              {contextCVs.length === 0 ? (
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', margin: '2rem 0' }}>
+                  No resumes uploaded yet. Upload one above.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: '300px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+                  {contextCVs.map((cv, index) => (
+                    <label 
+                      key={index} 
+                      className="cv-badge" 
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.75rem', 
+                        padding: '0.75rem', 
+                        borderRadius: '8px', 
+                        border: activeCVIndices.includes(index) ? '1px solid var(--accent-primary)' : '1px solid var(--card-border)',
+                        background: activeCVIndices.includes(index) ? 'rgba(37,99,235,0.02)' : 'transparent',
+                        cursor: 'pointer' 
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={activeCVIndices.includes(index)}
+                        onChange={() => handleToggleCVIndex(index)}
+                        style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)' }}
+                      />
+                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }} title={cv.name}>{cv.name}</span>
+                        <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Baseline Resume</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Checklist */}
+            <div className="glass-card" style={{ padding: '1.25rem', background: 'var(--bg-secondary)', border: '1px dashed var(--card-border)' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                <AlertCircle size={14} />
+                <span>Setup Checklist</span>
+              </h4>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <li style={{ color: contextCVs.length > 0 ? '#10b981' : 'inherit' }}>
+                  Upload at least 1 CV profile
+                </li>
+                <li style={{ color: activeCVIndices.length > 0 ? '#10b981' : 'inherit' }}>
+                  Select at least 1 baseline CV checklist
+                </li>
+                <li style={{ color: jobDescription.trim().length > 0 ? '#10b981' : 'inherit' }}>
+                  Paste the target Job Description (JD)
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Right Inputs Area */}
+          <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'var(--card-bg)' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={16} />
+              <span>2. Target Role & Focus</span>
+            </h3>
+
+            <div className="form-group">
+              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Paste Job Description (JD) *</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 400 }}>Cmd+Enter / Ctrl+Enter to generate</span>
+              </label>
+              <textarea
+                placeholder="Paste the complete job description of the role you are applying to. This helps the AI extract key skills, keywords, and responsibilities to optimize your resume."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                style={{ minHeight: '220px', fontSize: '0.85rem', lineHeight: '1.5' }}
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }} className="responsive-fields">
+              <div className="form-group">
+                <label>Future Aspirations / Focus (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Focus on Tech Lead aspects; prioritize React stack."
+                  value={aspirations}
+                  onChange={(e) => setAspirations(e.target.value)}
+                  style={{ fontSize: '0.85rem' }}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Output Format & Length</label>
+                <select
+                  value={targetLength}
+                  onChange={(e) => setTargetLength(e.target.value as TargetLength)}
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  <option value="1-page">1-Page ATS optimized sheet</option>
+                  <option value="2-page">2-Page standard document</option>
+                  <option value="3-page">3-Page comprehensive CV profile</option>
+                </select>
+              </div>
+            </div>
+
+            {/* API Key missing notification */}
+            {!isKeyConfigured && (
+              <div className="flex-row-gap" style={{ color: 'var(--danger)', fontSize: '0.85rem', background: 'rgba(186, 26, 26, 0.08)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                <AlertCircle size={16} />
+                <span>API Key missing for active provider. Update keys in Settings tab.</span>
+              </div>
+            )}
+
+            {error && (
+              <div className="flex-row-gap" style={{ color: 'var(--danger)', fontSize: '0.85rem', background: 'rgba(255, 59, 48, 0.08)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                <AlertCircle size={16} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button
+              className="btn btn-primary"
+              onClick={handleGenerate}
+              style={{ 
+                background: 'var(--accent-secondary)', 
+                alignSelf: 'flex-end', 
+                width: 'auto', 
+                padding: '0.75rem 2rem', 
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+              disabled={!canSubmit}
+            >
+              <Sparkles size={16} />
+              <span>Generate Optimized CV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderStepper = () => {
     const isCVMissing = contextCVs.length === 0;
     const isJDMissing = !jobDescription.trim();
@@ -1359,6 +1626,7 @@ function App() {
           {isCustomizing ? renderStepper() : (
             <>
               {activeTab === 'workspace' && renderWorkspaceTab()}
+              {activeTab === 'quick-optimize' && renderQuickOptimizeTab()}
               {activeTab === 'resumes' && renderResumesTab()}
               
               {activeTab === 'applications' && (
