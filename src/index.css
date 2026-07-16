@@ -1117,6 +1117,18 @@ textarea {
     margin: 0 !important;
   }
 
+  .print-pane {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
   .resume-preview-sheet {
     box-shadow: none !important;
     border-radius: 0 !important;
