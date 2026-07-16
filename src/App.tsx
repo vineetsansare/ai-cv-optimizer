@@ -21,7 +21,7 @@ const LOCAL_STORAGE_KEY_SIDEBAR = 'cv_builder_sidebar_collapsed';
 const DEFAULT_CONFIG: LLMConfig = {
   provider: 'gemini',
   apiKey: '',
-  model: 'gemini-3.5-flash',
+  model: 'gemini-1.5-flash',
 };
 
 interface CloudCV {
@@ -144,7 +144,7 @@ function App() {
           setConfig(prev => ({
             ...prev,
             provider: 'gemini',
-            model: 'gemini-3.5-flash'
+            model: 'gemini-1.5-flash'
           }));
         } else if (plan === 'byok') {
           getSavedAPIKeysStatus().then(setSavedKeys);
@@ -381,7 +381,7 @@ function App() {
     const activeCVs = activeCVIndices.map((idx) => contextCVs[idx]);
 
     const activeConfig = userProfile?.plan === 'free'
-      ? { ...config, provider: 'gemini' as const, model: 'gemini-3.5-flash' }
+      ? { ...config, provider: 'gemini' as const, model: 'gemini-1.5-flash' }
       : config;
 
     try {
@@ -413,7 +413,7 @@ function App() {
     abortControllerRef.current = new AbortController();
 
     const activeConfig = userProfile?.plan === 'free'
-      ? { ...config, provider: 'gemini' as const, model: 'gemini-3.5-flash' }
+      ? { ...config, provider: 'gemini' as const, model: 'gemini-1.5-flash' }
       : config;
 
     try {

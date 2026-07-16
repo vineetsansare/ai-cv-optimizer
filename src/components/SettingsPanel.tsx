@@ -11,9 +11,9 @@ interface SettingsPanelProps {
 }
 
 const PROVIDER_MODELS = {
-  gemini: ['gemini-3.5-flash', 'gemini-3.5-pro', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-1.5-flash', 'gemini-1.5-pro'],
-  openai: ['gpt-4o', 'gpt-4o-mini', 'o1-preview', 'o1-mini'],
-  anthropic: ['claude-fable-5', 'claude-opus-4-8', 'claude-sonnet-5', 'claude-haiku-4-5-20251001']
+  gemini: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+  openai: ['gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
+  anthropic: ['claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest', 'claude-3-opus-20240229']
 };
 
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -195,12 +195,12 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             <label htmlFor="llm-model">Default Generation Model</label>
             <select
               id="llm-model"
-              value={userProfile?.plan === 'free' ? 'gemini-3.5-flash' : config.model}
+              value={userProfile?.plan === 'free' ? 'gemini-1.5-flash' : config.model}
               onChange={handleModelChange}
               disabled={userProfile?.plan === 'free'}
             >
               {userProfile?.plan === 'free' ? (
-                <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
               ) : (
                 PROVIDER_MODELS[config.provider].map((m) => (
                   <option key={m} value={m}>
@@ -212,7 +212,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             {userProfile?.plan === 'free' && (
               <div style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', marginTop: '0.25rem', display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
                 <Info size={14} />
-                <span>Free trial is locked to Gemini 3.5 Flash. Upgrade or go BYOK to select others.</span>
+                <span>Free trial is locked to Gemini 1.5 Flash. Upgrade or go BYOK to select others.</span>
               </div>
             )}
           </div>
