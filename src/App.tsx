@@ -700,7 +700,7 @@ function App() {
 
   const renderTopNav = () => {
     return (
-      <header className="glass-header" style={{ position: 'fixed', top: 0, right: 0, left: sidebarCollapsed ? '72px' : '260px', height: '64px', borderBottom: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', zIndex: 30, transition: 'left 0.25s ease' }}>
+      <header className="glass-header top-header">
         <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '400px' }}>
           <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
             <Search size={16} style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }} />
@@ -1352,98 +1352,100 @@ function App() {
     <div className={`app-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       {renderSidebar()}
 
-      <main className="main-content" style={{ marginLeft: sidebarCollapsed ? '72px' : '260px', transition: 'margin-left 0.25s ease', paddingTop: '84px' }}>
+      <main className="main-layout">
         {renderTopNav()}
 
-        {isCustomizing ? renderStepper() : (
-          <>
-            {activeTab === 'workspace' && renderWorkspaceTab()}
-            {activeTab === 'resumes' && renderResumesTab()}
-            
-            {activeTab === 'applications' && (
-              <div className="glass-card entrance-fade" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--card-border)' }}>
-                  <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>Job Applications Tracker</h2>
-                  <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>View active applications pipeline and interview statuses.</p>
+        <div className="main-content">
+          {isCustomizing ? renderStepper() : (
+            <>
+              {activeTab === 'workspace' && renderWorkspaceTab()}
+              {activeTab === 'resumes' && renderResumesTab()}
+              
+              {activeTab === 'applications' && (
+                <div className="glass-card entrance-fade" style={{ padding: 0, overflow: 'hidden' }}>
+                  <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--card-border)' }}>
+                    <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>Job Applications Tracker</h2>
+                    <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>View active applications pipeline and interview statuses.</p>
+                  </div>
+                  <table className="saas-table">
+                    <thead>
+                      <tr>
+                        <th>Company</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>ATS Match</th>
+                        <th>Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{ fontWeight: 600 }}>Apple Inc.</td>
+                        <td>Systems Engineer</td>
+                        <td>
+                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(124, 58, 237, 0.1)', color: 'var(--accent-secondary)', fontWeight: 600 }}>Interviewing</span>
+                        </td>
+                        <td style={{ fontWeight: 700 }}>88%</td>
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 12, 2023</td>
+                      </tr>
+                      <tr>
+                        <td style={{ fontWeight: 600 }}>Amazon</td>
+                        <td>Senior Frontend Developer</td>
+                        <td>
+                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', fontWeight: 600 }}>Applied</span>
+                        </td>
+                        <td style={{ fontWeight: 700 }}>74%</td>
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 09, 2023</td>
+                      </tr>
+                      <tr>
+                        <td style={{ fontWeight: 600 }}>Netflix</td>
+                        <td>Cloud Infrastructure Lead</td>
+                        <td>
+                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(186, 26, 26, 0.1)', color: 'var(--danger)', fontWeight: 600 }}>Rejected</span>
+                        </td>
+                        <td style={{ fontWeight: 700 }}>62%</td>
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 05, 2023</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <table className="saas-table">
-                  <thead>
-                    <tr>
-                      <th>Company</th>
-                      <th>Role</th>
-                      <th>Status</th>
-                      <th>ATS Match</th>
-                      <th>Updated</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{ fontWeight: 600 }}>Apple Inc.</td>
-                      <td>Systems Engineer</td>
-                      <td>
-                        <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(124, 58, 237, 0.1)', color: 'var(--accent-secondary)', fontWeight: 600 }}>Interviewing</span>
-                      </td>
-                      <td style={{ fontWeight: 700 }}>88%</td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 12, 2023</td>
-                    </tr>
-                    <tr>
-                      <td style={{ fontWeight: 600 }}>Amazon</td>
-                      <td>Senior Frontend Developer</td>
-                      <td>
-                        <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', fontWeight: 600 }}>Applied</span>
-                      </td>
-                      <td style={{ fontWeight: 700 }}>74%</td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 09, 2023</td>
-                    </tr>
-                    <tr>
-                      <td style={{ fontWeight: 600 }}>Netflix</td>
-                      <td>Cloud Infrastructure Lead</td>
-                      <td>
-                        <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(186, 26, 26, 0.1)', color: 'var(--danger)', fontWeight: 600 }}>Rejected</span>
-                      </td>
-                      <td style={{ fontWeight: 700 }}>62%</td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 05, 2023</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            )}
+              )}
 
-            {activeTab === 'reports' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="entrance-fade">
-                <div>
-                  <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>ATS Reports Center</h2>
-                  <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>Review aggregate dashboard scoring trends and keywords gap recommendations.</p>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                  <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>85%</div>
-                    <div>
-                      <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Avg Keyword Match</h4>
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Based on last 3 optimizations</p>
+              {activeTab === 'reports' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="entrance-fade">
+                  <div>
+                    <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>ATS Reports Center</h2>
+                    <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>Review aggregate dashboard scoring trends and keywords gap recommendations.</p>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>85%</div>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Avg Keyword Match</h4>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Based on last 3 optimizations</p>
+                      </div>
+                    </div>
+                    <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>2/3</div>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Interviews Scheduled</h4>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>66% reply-back rate</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>2/3</div>
-                    <div>
-                      <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Interviews Scheduled</h4>
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>66% reply-back rate</p>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeTab === 'settings' && (
-              <SettingsPanel
-                config={config}
-                onChangeConfig={handleConfigChange}
-                userProfile={userProfile}
-                onLogout={handleLogout}
-              />
-            )}
-          </>
-        )}
+              {activeTab === 'settings' && (
+                <SettingsPanel
+                  config={config}
+                  onChangeConfig={handleConfigChange}
+                  userProfile={userProfile}
+                  onLogout={handleLogout}
+                />
+              )}
+            </>
+          )}
+        </div>
       </main>
     </div>
   );

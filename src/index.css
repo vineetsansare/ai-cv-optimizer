@@ -115,20 +115,8 @@ body {
 
 /* Layout Utilities */
 .app-container {
-  display: grid;
-  grid-template-columns: 320px 1fr;
   min-height: 100vh;
   width: 100%;
-}
-
-.app-container.sidebar-collapsed {
-  grid-template-columns: 72px 1fr;
-}
-
-@media (max-width: 1024px) {
-  .app-container, .app-container.sidebar-collapsed {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Sidebar */
@@ -140,11 +128,13 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
-  z-index: 10;
+  z-index: 40; /* Higher than top bar header to avoid button clipping */
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.01);
   overflow: visible;
+  box-sizing: border-box;
 }
 
 .sidebar-scroll-area {
@@ -204,15 +194,68 @@ body {
   width: 100%;
 }
 
-/* Main Content */
+/* Main Layout & Responsive Canvas */
+.main-layout {
+  margin-left: 260px;
+  transition: margin-left 0.25s ease;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 84px; /* leaves spacing below fixed top navbar */
+  width: auto;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.sidebar-collapsed .main-layout {
+  margin-left: 72px;
+}
+
+@media (max-width: 1024px) {
+  .main-layout, .sidebar-collapsed .main-layout {
+    margin-left: 0;
+    padding-top: 0;
+  }
+}
+
+.top-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 260px;
+  height: 64px;
+  border-bottom: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 30;
+  transition: left 0.25s ease;
+  box-sizing: border-box;
+}
+
+.sidebar-collapsed .top-header {
+  left: 72px;
+}
+
+@media (max-width: 1024px) {
+  .top-header, .sidebar-collapsed .top-header {
+    position: relative;
+    left: 0;
+    width: 100%;
+  }
+}
+
+/* Main Content Wrapper */
 .main-content {
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  max-width: 1300px;
+  max-width: 1440px; /* Expands width to reduce empty layout margins */
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
