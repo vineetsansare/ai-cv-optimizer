@@ -1154,6 +1154,8 @@ function App() {
             result={result}
             onUpdateMarkdown={handleUpdateMarkdown}
             onAutoFix={handleAutoFix}
+            userProfile={userProfile}
+            jobDescription={jobDescription}
           />
         </div>
       );
@@ -1545,6 +1547,8 @@ function App() {
                 result={result}
                 onUpdateMarkdown={handleUpdateMarkdown}
                 onAutoFix={handleAutoFix}
+                userProfile={userProfile}
+                jobDescription={jobDescription}
               />
             )}
           </div>

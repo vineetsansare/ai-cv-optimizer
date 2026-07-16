@@ -7,11 +7,19 @@ interface CVDisplayProps {
   result: CVGenerationResult;
   onUpdateMarkdown: (markdown: string) => void;
   onAutoFix?: () => void;
+  userProfile?: any;
+  jobDescription?: string;
 }
 
 type TabType = 'preview' | 'editor' | 'ats' | 'tweaks' | 'cover';
 
-export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown, onAutoFix }) => {
+export const CVDisplay: React.FC<CVDisplayProps> = ({ 
+  result, 
+  onUpdateMarkdown, 
+  onAutoFix,
+  userProfile,
+  jobDescription
+}) => {
   const [activeTab, setActiveTab] = useState<TabType>('preview');
   const [copied, setCopied] = useState<'markdown' | 'text' | 'cover' | null>(null);
 
@@ -35,7 +43,67 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({ result, onUpdateMarkdown, 
   };
 
   const handlePrint = () => {
+    const originalTitle = document.title;
+    
+    // 1. Get first name
+    const firstName = userProfile?.full_name?.split(' ')[0] || 'Resume';
+    
+    // 2. Extract title and company from JD
+    let company = 'Company';
+    let roleTitle = 'Role';
+    
+    if (jobDescription) {
+      const lines = jobDescription.split('\n').map(l => l.trim());
+      for (const line of lines) {
+        const companyMatch = line.match(/^(?:company|organization|employer)\s*:\s*(.+)$/i);
+        if (companyMatch) company = companyMatch[1].trim();
+        
+        const titleMatch = line.match(/^(?:job title|title|role|position)\s*:\s*(.+)$/i);
+        if (titleMatch) roleTitle = titleMatch[1].trim();
+      }
+    }
+    
+    // Fallback for role title from Markdown headers
+    if (roleTitle === 'Role' && result.cvMarkdown) {
+      const mdLines = result.cvMarkdown.split('\n').map(l => l.trim()).filter(Boolean);
+      const nameHeaderIndex = mdLines.findIndex(l => l.startsWith('# '));
+      if (nameHeaderIndex !== -1 && mdLines[nameHeaderIndex + 1]) {
+        roleTitle = mdLines[nameHeaderIndex + 1].replace(/[\*\#\_]/g, '').trim();
+      }
+    }
+    
+    // Fallback for company from JD text search
+    if (company === 'Company' && jobDescription) {
+      const textSegment = jobDescription.slice(0, 1000);
+      const atMatch = textSegment.match(/(?:at|with)\s+([A-Z][a-zA-Z0-9\s]{1,20}?)(?:\s+is\s+looking|\s+seeks|\s+hiring|\s*[\.\,\n])/);
+      if (atMatch) {
+        company = atMatch[1].trim();
+      } else {
+        const aboutMatch = textSegment.match(/About\s+([A-Z][a-zA-Z0-9\s]{1,20}?)(?:\s*[\:\-\n\.]|$)/);
+        if (aboutMatch) company = aboutMatch[1].trim();
+      }
+    }
+    
+    // Format helper for safe tokens
+    const cleanFilenameToken = (str: string) => {
+      return str
+        .replace(/[^\w\s\-]/g, '')
+        .trim()
+        .replace(/[\s\_]+/g, '-');
+    };
+    
+    const cleanFirst = cleanFilenameToken(firstName);
+    const cleanRole = cleanFilenameToken(roleTitle);
+    const cleanCompany = cleanFilenameToken(company);
+    
+    // Set temporary document title
+    document.title = `${cleanFirst}-${cleanRole}-${cleanCompany}`;
+    
+    // Trigger browser print
     window.print();
+    
+    // Restore original document title
+    document.title = originalTitle;
   };
 
   // Helper to calculate circular stroke values
