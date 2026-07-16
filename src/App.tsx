@@ -7,10 +7,9 @@ import type { LLMConfig, CVGenerationResult, TargetLength } from './utils/llm';
 import { parsePdf } from './utils/pdfParser';
 import { 
   Sparkles, Sun, Moon, AlertCircle,
-  LayoutDashboard, FileText, Briefcase, BarChart3,
-  Settings, LogOut, ChevronLeft, ChevronRight,
+  FileText, Settings, LogOut, ChevronLeft, ChevronRight,
   Upload, Plus, Download, Trash2,
-  Copy, Search, ArrowRight, Zap, ArrowLeft
+  Copy, ArrowRight, Zap, ArrowLeft
 } from 'lucide-react';
 import { supabase } from './utils/supabase';
 
@@ -59,7 +58,7 @@ function App() {
   // Theme & Layout States
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState<'workspace' | 'quick-optimize' | 'resumes' | 'applications' | 'reports' | 'settings'>('workspace');
+  const [activeTab, setActiveTab] = useState<'workspace' | 'quick-optimize' | 'resumes' | 'applications' | 'reports' | 'settings'>('quick-optimize');
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [customizerStep, setCustomizerStep] = useState(1);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -622,21 +621,12 @@ function App() {
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flexGrow: 1 }}>
             <button 
-              className={`tab ${activeTab === 'workspace' && !isCustomizing ? 'active' : ''}`} 
-              onClick={() => { setActiveTab('workspace'); setIsCustomizing(false); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
-            >
-              <LayoutDashboard size={18} />
-              {!sidebarCollapsed && <span className="font-label-sm">Dashboard</span>}
-            </button>
-
-            <button 
               className={`tab ${activeTab === 'quick-optimize' && !isCustomizing ? 'active' : ''}`} 
               onClick={() => { setActiveTab('quick-optimize'); setIsCustomizing(false); }}
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
             >
               <Sparkles size={18} style={{ color: 'var(--accent-secondary)' }} />
-              {!sidebarCollapsed && <span className="font-label-sm">Quick Optimize</span>}
+              {!sidebarCollapsed && <span className="font-label-sm">AI Optimize CV</span>}
             </button>
 
             <button 
@@ -646,24 +636,6 @@ function App() {
             >
               <FileText size={18} />
               {!sidebarCollapsed && <span className="font-label-sm">My Resumes</span>}
-            </button>
-
-            <button 
-              className={`tab ${activeTab === 'applications' && !isCustomizing ? 'active' : ''}`} 
-              onClick={() => { setActiveTab('applications'); setIsCustomizing(false); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
-            >
-              <Briefcase size={18} />
-              {!sidebarCollapsed && <span className="font-label-sm">Job Applications</span>}
-            </button>
-
-            <button 
-              className={`tab ${activeTab === 'reports' && !isCustomizing ? 'active' : ''}`} 
-              onClick={() => { setActiveTab('reports'); setIsCustomizing(false); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
-            >
-              <BarChart3 size={18} />
-              {!sidebarCollapsed && <span className="font-label-sm">ATS Reports</span>}
             </button>
 
             <div style={{ margin: '1rem 0 0.5rem 0.5rem', fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>
@@ -710,16 +682,7 @@ function App() {
   const renderTopNav = () => {
     return (
       <header className="glass-header top-header">
-        <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '400px' }}>
-          <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
-            <Search size={16} style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }} />
-            <input 
-              type="text" 
-              placeholder="Search Workspace..." 
-              style={{ border: 'none', background: 'none', outline: 'none', fontSize: '0.85rem', width: '100%', padding: 0 }}
-            />
-          </div>
-        </div>
+        <div style={{ flexGrow: 1 }}></div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button 
@@ -1166,10 +1129,10 @@ function App() {
         {/* Header Section */}
         <div>
           <h2 style={{ fontSize: '2.1rem', margin: 0, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-            Instant CV Customizer
+            Welcome back, {userProfile?.full_name?.split(' ')[0] || 'Vineet'} 👋
           </h2>
           <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.95rem' }}>
-            Instantly align your career history to fit any job opening with perfect ATS styling.
+            Ready to land your next role? Optimize your resume for any job description in seconds.
           </p>
         </div>
 
