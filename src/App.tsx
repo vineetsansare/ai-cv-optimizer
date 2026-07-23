@@ -1146,23 +1146,23 @@ function App() {
         {/* 1-2-3 Instruction Steps */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem' }}>
           <LiquidCard variant="glass" padding="sm" hoverEffect={true} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37,99,235,0.2)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
             <div>
-              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Select Profiles</h4>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Select Profiles</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Check the resumes in the left column to provide your career history context.</p>
             </div>
           </LiquidCard>
           <LiquidCard variant="glass" padding="sm" hoverEffect={true} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(124,58,237,0.2)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
             <div>
-              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Paste Target JD</h4>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Paste Target JD</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Paste the full text of the job description you are applying for.</p>
             </div>
           </LiquidCard>
           <LiquidCard variant="glass" padding="sm" hoverEffect={true} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16,185,129,0.2)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
             <div>
-              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Run AI Customizer</h4>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Run AI Customizer</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Set target length or focus area, and hit generate to output optimized resume.</p>
             </div>
           </LiquidCard>

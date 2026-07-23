@@ -45,16 +45,16 @@
 /* Dark Mode Overrides - Tahoe & Stitch Obsidian */
 .dark-theme {
   --bg-primary: #0B0F17;
-  --bg-secondary: #0f131c;
-  --bg-tertiary: rgba(30, 34, 45, 0.8);
+  --bg-secondary: rgba(15, 19, 28, 0.7);
+  --bg-tertiary: rgba(30, 34, 45, 0.6);
   
-  --card-bg: rgba(24, 28, 36, 0.75);
+  --card-bg: rgba(24, 28, 36, 0.65);
   --card-border: rgba(255, 255, 255, 0.15);
   --card-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   
   --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.8);
-  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-muted: rgba(255, 255, 255, 0.7);
   
   --accent-primary: #7c3aed; /* Stitch Violet */
   --accent-primary-hover: #6d28d9;
@@ -1366,39 +1366,39 @@ textarea {
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.45;
+  filter: blur(90px);
+  opacity: 0.65;
   animation: auroraFloat 22s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 .dark-theme .aurora-blob {
-  opacity: 0.3;
+  opacity: 0.6;
 }
 
 .blob-indigo {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(99, 102, 241, 0) 70%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.55) 0%, rgba(99, 102, 241, 0) 70%);
   top: -100px;
   left: -100px;
   animation-duration: 25s;
 }
 
 .blob-violet {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, rgba(139, 92, 246, 0) 70%);
-  top: 40%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(210, 187, 255, 0) 70%);
+  top: 35%;
   right: -150px;
   animation-duration: 30s;
   animation-delay: -5s;
 }
 
 .blob-cyan {
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(59, 130, 246, 0) 70%);
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(6, 182, 212, 0) 70%);
   bottom: -100px;
   left: 20%;
   animation-duration: 20s;
@@ -1406,9 +1406,9 @@ textarea {
 }
 
 .blob-glow {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%);
   top: 15%;
   left: 45%;
   animation-duration: 18s;
@@ -1416,7 +1416,7 @@ textarea {
 }
 
 .dark-theme .blob-glow {
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+  background: radial-gradient(circle, rgba(210, 187, 255, 0.35) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 .aurora-grid-overlay {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ParticlesCanvas } from './ParticlesCanvas';
 
 interface AuroraBackgroundProps {
   children?: React.ReactNode;
@@ -9,11 +10,14 @@ interface AuroraBackgroundProps {
 export const AuroraBackground: React.FC<AuroraBackgroundProps> = ({
   children,
   className = '',
-  intensity = 'subtle'
+  intensity = 'vibrant'
 }) => {
   return (
     <div className={`aurora-wrapper ${className}`}>
-      {/* Dynamic ambient background blobs */}
+      {/* 60fps Floating Ambient Particles Layer */}
+      <ParticlesCanvas />
+
+      {/* Dynamic ambient background mesh blobs */}
       <div className={`aurora-container ${intensity}`}>
         <div className="aurora-blob blob-indigo" />
         <div className="aurora-blob blob-violet" />
