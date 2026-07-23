@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye, FileEdit, BarChart3, Sparkles, Printer, Copy, Check, Mail } from 'lucide-react';
 import type { CVGenerationResult } from '../utils/llm';
 import { parseMarkdownToHtml, stripMarkdown } from '../utils/mdParser';
+import { LiquidCard } from './ui/LiquidCard';
 
 interface CVDisplayProps {
   result: CVGenerationResult;
@@ -125,7 +126,7 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
   };
 
   return (
-    <div className="glass-card cv-display-card" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+    <LiquidCard variant="glass" padding="md" className="cv-display-card" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
       <div className="glass-card-header cv-display-header" style={{ flexWrap: 'wrap', gap: '1rem' }}>
         <div className="tabs-container" style={{ margin: 0, borderBottom: 'none', padding: 0, flexWrap: 'wrap' }}>
           <button
@@ -379,6 +380,6 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </LiquidCard>
   );
 };

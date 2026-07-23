@@ -12,6 +12,9 @@ import {
   Copy, ArrowRight, Zap, ArrowLeft
 } from 'lucide-react';
 import { supabase } from './utils/supabase';
+import { AuroraBackground } from './components/ui/AuroraBackground';
+import { LiquidCard } from './components/ui/LiquidCard';
+import { UploadIllustration, AICoachIllustration, EmptyStateIllustration } from './components/ui/Illustrations';
 
 const LOCAL_STORAGE_KEY_CONFIG = 'cv_builder_llm_config';
 const LOCAL_STORAGE_KEY_THEME = 'cv_builder_theme';
@@ -929,9 +932,12 @@ function App() {
 
             {/* Widget 2: AI Coach Suggestions */}
             <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(124, 58, 237, 0.03)', border: '1px solid rgba(124, 58, 237, 0.15)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-secondary)' }}>
-                <Sparkles size={18} />
-                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>AI Workspace Coach</h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--accent-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Sparkles size={18} />
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>AI Workspace Coach</h4>
+                </div>
+                <AICoachIllustration size={32} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -1079,7 +1085,7 @@ function App() {
 
     if (generating) {
       return (
-        <div className="glass-card font-body-md entrance-fade" style={{ maxWidth: '900px', margin: '2rem auto', padding: '3rem 2rem' }}>
+        <LiquidCard variant="glass" padding="lg" style={{ maxWidth: '900px', margin: '2rem auto' }} className="entrance-fade">
           <div className="scanner-container">
             <div className="radar-sweep">
               <div className="radar-scan-line"></div>
@@ -1091,7 +1097,7 @@ function App() {
               Cancel Customization
             </button>
           </div>
-        </div>
+        </LiquidCard>
       );
     }
 
@@ -1138,27 +1144,27 @@ function App() {
 
         {/* 1-2-3 Instruction Steps */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem' }}>
-          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', background: 'var(--card-bg)' }}>
+          <LiquidCard variant="glass" padding="sm" hoverEffect={true} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
             <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
             <div>
               <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Select Profiles</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Check the resumes in the left column to provide your career history context.</p>
             </div>
-          </div>
-          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', background: 'var(--card-bg)' }}>
+          </LiquidCard>
+          <LiquidCard variant="glass" padding="sm" hoverEffect={true} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
             <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
             <div>
               <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Paste Target JD</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Paste the full text of the job description you are applying for.</p>
             </div>
-          </div>
-          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', background: 'var(--card-bg)' }}>
+          </LiquidCard>
+          <LiquidCard variant="glass" padding="sm" hoverEffect={true} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
             <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
             <div>
               <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', fontWeight: 700 }}>Run AI Customizer</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Set target length or focus area, and hit generate to output optimized resume.</p>
             </div>
-          </div>
+          </LiquidCard>
         </div>
 
         {/* Split Grid */}
@@ -1174,7 +1180,7 @@ function App() {
 
               {/* Upload Dropzone */}
               <div style={{ marginBottom: '1.25rem' }}>
-                <label className="saas-upload-dropzone" style={{ padding: '1rem 0.5rem', minHeight: '100px', cursor: 'pointer' }}>
+                <label className="saas-upload-dropzone" style={{ padding: '1.25rem 0.5rem', minHeight: '120px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <input 
                     type="file" 
                     accept=".pdf,.txt,.md" 
@@ -1182,17 +1188,20 @@ function App() {
                     style={{ display: 'none' }} 
                     multiple 
                   />
-                  <Upload size={20} style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }} />
-                  <span style={{ fontSize: '11px', fontWeight: 600, display: 'block' }}>Upload Resume Profile</span>
-                  <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>PDF, TXT, MD up to 10MB</span>
+                  <UploadIllustration size={48} className="mb-2" />
+                  <span style={{ fontSize: '12px', fontWeight: 700, display: 'block', marginTop: '0.5rem' }}>Upload Resume Profile</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>PDF, TXT, MD up to 10MB</span>
                 </label>
               </div>
 
               {/* Checkboxes */}
               {contextCVs.length === 0 ? (
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', margin: '2rem 0' }}>
-                  No resumes uploaded yet. Upload one above.
-                </p>
+                <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                  <EmptyStateIllustration size={64} style={{ margin: '0 auto 0.5rem' }} />
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+                    No resumes uploaded yet. Upload one above.
+                  </p>
+                </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: '300px', overflowY: 'auto', paddingRight: '0.25rem' }}>
                   {contextCVs.map((cv, index) => (
@@ -1583,106 +1592,108 @@ function App() {
   };
 
   return (
-    <div className={`app-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      {renderSidebar()}
+    <AuroraBackground>
+      <div className={`app-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        {renderSidebar()}
 
-      <main className="main-layout">
-        {renderTopNav()}
+        <main className="main-layout">
+          {renderTopNav()}
 
-        <div className="main-content">
-          {isCustomizing ? renderStepper() : (
-            <>
-              {activeTab === 'workspace' && renderWorkspaceTab()}
-              {activeTab === 'quick-optimize' && renderQuickOptimizeTab()}
-              {activeTab === 'resumes' && renderResumesTab()}
-              
-              {activeTab === 'applications' && (
-                <div className="glass-card entrance-fade" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--card-border)' }}>
-                    <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>Job Applications Tracker</h2>
-                    <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>View active applications pipeline and interview statuses.</p>
+          <div className="main-content">
+            {isCustomizing ? renderStepper() : (
+              <>
+                {activeTab === 'workspace' && renderWorkspaceTab()}
+                {activeTab === 'quick-optimize' && renderQuickOptimizeTab()}
+                {activeTab === 'resumes' && renderResumesTab()}
+                
+                {activeTab === 'applications' && (
+                  <div className="glass-card entrance-fade" style={{ padding: 0, overflow: 'hidden' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--card-border)' }}>
+                      <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>Job Applications Tracker</h2>
+                      <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>View active applications pipeline and interview statuses.</p>
+                    </div>
+                    <table className="saas-table">
+                      <thead>
+                        <tr>
+                          <th>Company</th>
+                          <th>Role</th>
+                          <th>Status</th>
+                          <th>ATS Match</th>
+                          <th>Updated</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ fontWeight: 600 }}>Apple Inc.</td>
+                          <td>Systems Engineer</td>
+                          <td>
+                            <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(124, 58, 237, 0.1)', color: 'var(--accent-secondary)', fontWeight: 600 }}>Interviewing</span>
+                          </td>
+                          <td style={{ fontWeight: 700 }}>88%</td>
+                          <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 12, 2023</td>
+                        </tr>
+                        <tr>
+                          <td style={{ fontWeight: 600 }}>Amazon</td>
+                          <td>Senior Frontend Developer</td>
+                          <td>
+                            <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', fontWeight: 600 }}>Applied</span>
+                          </td>
+                          <td style={{ fontWeight: 700 }}>74%</td>
+                          <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 09, 2023</td>
+                        </tr>
+                        <tr>
+                          <td style={{ fontWeight: 600 }}>Netflix</td>
+                          <td>Cloud Infrastructure Lead</td>
+                          <td>
+                            <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(186, 26, 26, 0.1)', color: 'var(--danger)', fontWeight: 600 }}>Rejected</span>
+                          </td>
+                          <td style={{ fontWeight: 700 }}>62%</td>
+                          <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 05, 2023</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <table className="saas-table">
-                    <thead>
-                      <tr>
-                        <th>Company</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>ATS Match</th>
-                        <th>Updated</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td style={{ fontWeight: 600 }}>Apple Inc.</td>
-                        <td>Systems Engineer</td>
-                        <td>
-                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(124, 58, 237, 0.1)', color: 'var(--accent-secondary)', fontWeight: 600 }}>Interviewing</span>
-                        </td>
-                        <td style={{ fontWeight: 700 }}>88%</td>
-                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 12, 2023</td>
-                      </tr>
-                      <tr>
-                        <td style={{ fontWeight: 600 }}>Amazon</td>
-                        <td>Senior Frontend Developer</td>
-                        <td>
-                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', fontWeight: 600 }}>Applied</span>
-                        </td>
-                        <td style={{ fontWeight: 700 }}>74%</td>
-                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 09, 2023</td>
-                      </tr>
-                      <tr>
-                        <td style={{ fontWeight: 600 }}>Netflix</td>
-                        <td>Cloud Infrastructure Lead</td>
-                        <td>
-                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(186, 26, 26, 0.1)', color: 'var(--danger)', fontWeight: 600 }}>Rejected</span>
-                        </td>
-                        <td style={{ fontWeight: 700 }}>62%</td>
-                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 05, 2023</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                )}
 
-              {activeTab === 'reports' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="entrance-fade">
-                  <div>
-                    <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>ATS Reports Center</h2>
-                    <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>Review aggregate dashboard scoring trends and keywords gap recommendations.</p>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                    <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>85%</div>
-                      <div>
-                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Avg Keyword Match</h4>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Based on last 3 optimizations</p>
+                {activeTab === 'reports' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="entrance-fade">
+                    <div>
+                      <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>ATS Reports Center</h2>
+                      <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0 0', fontSize: '0.85rem' }}>Review aggregate dashboard scoring trends and keywords gap recommendations.</p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                      <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>85%</div>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Avg Keyword Match</h4>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Based on last 3 optimizations</p>
+                        </div>
+                      </div>
+                      <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>2/3</div>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Interviews Scheduled</h4>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>66% reply-back rate</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(124,58,237,0.1)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>2/3</div>
-                      <div>
-                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Interviews Scheduled</h4>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>66% reply-back rate</p>
-                      </div>
-                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {activeTab === 'settings' && (
-                <SettingsPanel
-                  config={config}
-                  onChangeConfig={handleConfigChange}
-                  userProfile={userProfile}
-                  onLogout={handleLogout}
-                />
-              )}
-            </>
-          )}
-        </div>
-      </main>
-    </div>
+                {activeTab === 'settings' && (
+                  <SettingsPanel
+                    config={config}
+                    onChangeConfig={handleConfigChange}
+                    userProfile={userProfile}
+                    onLogout={handleLogout}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </main>
+      </div>
+    </AuroraBackground>
   );
 }
 
