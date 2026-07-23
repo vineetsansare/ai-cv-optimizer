@@ -3,6 +3,7 @@ import { supabase } from '../utils/supabase';
 import { Mail, Lock, User, Sparkles, AlertCircle, ArrowRight, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
 import { AuroraBackground } from './ui/AuroraBackground';
 import { LiquidCard } from './ui/LiquidCard';
+import { CursorTrailProvider } from './ui/CursorTrailProvider';
 
 interface AuthFormProps {
   onSuccess: () => void;
@@ -17,6 +18,20 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // 3D Notebook Page Flip state
+  const [flipState, setFlipState] = useState<'idle' | 'out' | 'in'>('idle');
+
+  const triggerModeSwitch = (switchAction: () => void) => {
+    setFlipState('out');
+    setTimeout(() => {
+      switchAction();
+      setError(null);
+      setSuccess(null);
+      setFlipState('in');
+      setTimeout(() => setFlipState('idle'), 350);
+    }, 180);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,91 +106,101 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     }
   };
 
+  const flipClass = flipState === 'out' ? 'flip-out' : flipState === 'in' ? 'flip-in' : '';
+
   return (
-    <AuroraBackground intensity="vibrant">
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        width: '100vw',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem 1rem'
-      }}>
+    <CursorTrailProvider>
+      <AuroraBackground intensity="vibrant">
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          maxWidth: '1040px',
-          width: '100%',
-          gap: '2.5rem',
-          alignItems: 'center'
+          display: 'flex',
+          minHeight: '100vh',
+          width: '100vw',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem 1rem'
         }}>
-          {/* Left Showcase Panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }} className="entrance-fade">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                boxShadow: '0 8px 20px -4px rgba(37,99,235,0.4)'
-              }}>
-                <Sparkles size={22} />
-              </div>
-              <div>
-                <h1 style={{ fontSize: '1.4rem', fontWeight: 900, margin: 0, letterSpacing: '-0.02em' }}>JD2CV</h1>
-                <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em', margin: 0, color: 'var(--text-muted)', fontWeight: 700 }}>Career Workspace</p>
-              </div>
-            </div>
-
-            <div>
-              <h2 style={{ fontSize: '2.4rem', fontWeight: 800, margin: '0 0 0.75rem 0', lineHeight: 1.15, letterSpacing: '-0.03em' }}>
-                Elevate your career with AI-powered ATS precision.
-              </h2>
-              <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
-                Transform your experience bullet points to match target job descriptions seamlessly.
-              </p>
-            </div>
-
-            {/* Feature Highlights Card Deck */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--card-border)', borderRadius: '12px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Zap size={18} />
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+            maxWidth: '1040px',
+            width: '100%',
+            gap: '2.5rem',
+            alignItems: 'center'
+          }}>
+            {/* Left Showcase Panel */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }} className="entrance-fade">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} className="stagger-1">
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  boxShadow: '0 8px 20px -4px rgba(124, 58, 237, 0.5)'
+                }}>
+                  <Sparkles size={22} />
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700 }}>Instant Context Matching</h4>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Extract relevant evidence across multiple uploaded baseline resumes.</p>
+                  <h1 style={{ fontSize: '1.4rem', fontWeight: 900, margin: 0, letterSpacing: '-0.02em', color: '#FFFFFF' }}>JD2CV</h1>
+                  <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em', margin: 0, color: 'var(--text-muted)', fontWeight: 700 }}>Career Workspace</p>
                 </div>
               </div>
 
-              <div className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--card-border)', borderRadius: '12px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ShieldCheck size={18} />
+              <div className="stagger-2">
+                <h2 style={{ fontSize: '2.4rem', fontWeight: 800, margin: '0 0 0.75rem 0', lineHeight: 1.15, letterSpacing: '-0.03em', color: '#FFFFFF' }}>
+                  Elevate your career with AI-powered ATS precision.
+                </h2>
+                <p style={{ fontSize: '1.05rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, lineHeight: 1.6 }}>
+                  Transform your experience bullet points to match target job descriptions seamlessly.
+                </p>
+              </div>
+
+              {/* Feature Highlights Card Deck with Slow Vertical Float Drift */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="stagger-3">
+                <div className="glass-card float-drift-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(124, 58, 237, 0.2)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Zap size={18} />
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>Instant Context Matching</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)' }}>Extract relevant evidence across multiple uploaded baseline resumes.</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700 }}>ATS Score Diagnostics</h4>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Live keyword gap analytics and automated one-click fix recommendations.</p>
+
+                <div className="glass-card float-drift-card-delayed" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(16,185,129,0.2)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>ATS Score Diagnostics</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)' }}>Live keyword gap analytics and automated one-click fix recommendations.</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Liquid Glass Form Card */}
-          <LiquidCard variant="glass" padding="lg" hoverEffect={false} style={{ maxWidth: '440px', width: '100%', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0' }}>
-                {isForgotPassword ? 'Reset Password' : isSignUp ? 'Create Your Account' : 'Welcome Back'}
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0 }}>
-                {isForgotPassword 
-                  ? 'Enter your email to receive a recovery link' 
-                  : isSignUp ? 'Join the future of ATS customization' : 'Sign in to access your Career Workspace'}
-              </p>
-            </div>
+            {/* Right Liquid Glass Form Card with 3D Notebook Flip */}
+            <div className="perspective-container">
+              <LiquidCard
+                variant="glass"
+                padding="lg"
+                hoverEffect={false}
+                className={`notebook-card-flip ${flipClass} ${error ? 'error-shake' : ''}`}
+                style={{ maxWidth: '440px', width: '100%', margin: '0 auto' }}
+              >
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                  <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: '#FFFFFF' }}>
+                    {isForgotPassword ? 'Reset Password' : isSignUp ? 'Create Your Account' : 'Welcome Back'}
+                  </h2>
+                  <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem', margin: 0 }}>
+                    {isForgotPassword 
+                      ? 'Enter your email to receive a recovery link' 
+                      : isSignUp ? 'Join the future of ATS customization' : 'Sign in to access your Career Workspace'}
+                  </p>
+                </div>
 
             {error && (
               <div style={{
@@ -255,7 +280,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     {!isSignUp && (
                       <button
                         type="button"
-                        onClick={() => { setIsForgotPassword(true); setError(null); setSuccess(null); }}
+                        onClick={() => triggerModeSwitch(() => setIsForgotPassword(true))}
                         style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', padding: 0, cursor: 'pointer' }}
                       >
                         Forgot Password?
@@ -292,7 +317,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem' }}>
                 <button
                   type="button"
-                  onClick={() => { setIsForgotPassword(false); setError(null); setSuccess(null); }}
+                  onClick={() => triggerModeSwitch(() => setIsForgotPassword(false))}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontWeight: 600, padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
                 >
                   Back to Sign In
@@ -312,7 +337,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     className="btn"
                     disabled={loading}
                     onClick={() => handleSocialLogin('google')}
-                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', color: 'var(--text-primary)' }}
+                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF' }}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.572 0-6.47-2.898-6.47-6.47s2.898-6.47 6.47-6.47c1.558 0 2.977.56 4.1 1.488l3.09-3.09C19.33 2.14 16.02 1 12.24 1 5.67 1 .35 6.32.35 12.89s5.32 11.89 11.89 11.89c7.22 0 11.89-5.08 11.89-12.09 0-.82-.08-1.61-.21-2.4H12.24z"/>
@@ -325,7 +350,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     className="btn"
                     disabled={loading}
                     onClick={() => handleSocialLogin('github')}
-                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', color: 'var(--text-primary)' }}
+                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF' }}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
@@ -339,7 +364,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   className="btn"
                   disabled={loading}
                   onClick={() => handleSocialLogin('linkedin_oidc')}
-                  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', color: 'var(--text-primary)', marginTop: '0.75rem', width: '100%' }}
+                  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', marginTop: '0.75rem', width: '100%' }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
@@ -348,13 +373,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
                   </span>
                   <button
                     type="button"
-                    onClick={() => { setIsSignUp(!isSignUp); setError(null); setSuccess(null); }}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontWeight: 600, padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => triggerModeSwitch(() => setIsSignUp(!isSignUp))}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent-secondary)', fontWeight: 600, padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     {isSignUp ? 'Sign In' : 'Sign Up'}
                   </button>
@@ -364,6 +389,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
           </LiquidCard>
         </div>
       </div>
+    </div>
     </AuroraBackground>
+    </CursorTrailProvider>
   );
 };
