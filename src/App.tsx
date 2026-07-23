@@ -624,7 +624,7 @@ function App() {
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flexGrow: 1 }}>
             <button 
-              className={`tab ${activeTab === 'quick-optimize' && !isCustomizing ? 'active' : ''}`} 
+              className={`tab ${activeTab === 'quick-optimize' && !isCustomizing ? 'active nav-item-active' : ''}`} 
               onClick={() => { setActiveTab('quick-optimize'); setIsCustomizing(false); }}
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
             >
@@ -633,7 +633,7 @@ function App() {
             </button>
 
             <button 
-              className={`tab ${activeTab === 'resumes' && !isCustomizing ? 'active' : ''}`} 
+              className={`tab ${activeTab === 'resumes' && !isCustomizing ? 'active nav-item-active' : ''}`} 
               onClick={() => { setActiveTab('resumes'); setIsCustomizing(false); }}
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
             >
@@ -646,7 +646,7 @@ function App() {
             </div>
 
             <button 
-              className={`tab ${activeTab === 'settings' && !isCustomizing ? 'active' : ''}`} 
+              className={`tab ${activeTab === 'settings' && !isCustomizing ? 'active nav-item-active' : ''}`} 
               onClick={() => { setActiveTab('settings'); setIsCustomizing(false); }}
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
             >

@@ -268,7 +268,7 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
                 <svg className="ats-score-circle-svg">
                   <circle className="ats-score-circle-bg" cx="60" cy="60" r={radius} />
                   <circle
-                    className={`ats-score-circle-fill ${getScoreColorClass(result.atsScore)}`}
+                    className={`ats-score-circle-fill progress-ring-circle ${getScoreColorClass(result.atsScore)}`}
                     cx="60"
                     cy="60"
                     r={radius}

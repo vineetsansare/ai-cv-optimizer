@@ -42,28 +42,28 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode Overrides - Tahoe & Stitch Obsidian */
 .dark-theme {
-  --bg-primary: #0b0f19;
-  --bg-secondary: rgba(17, 24, 39, 0.6);
-  --bg-tertiary: rgba(31, 41, 55, 0.5);
+  --bg-primary: #0B0F17;
+  --bg-secondary: #0f131c;
+  --bg-tertiary: rgba(30, 34, 45, 0.8);
   
-  --card-bg: rgba(17, 24, 39, 0.6);
-  --card-border: rgba(255, 255, 255, 0.1);
-  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --card-bg: rgba(24, 28, 36, 0.75);
+  --card-border: rgba(255, 255, 255, 0.15);
+  --card-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   
-  --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.6);
   
-  --accent-primary: #6366f1; /* Indigo */
-  --accent-primary-hover: #4f46e5;
-  --accent-secondary: #10b981; /* Mint Emerald */
-  --accent-secondary-hover: #059669;
-  --accent-accent: #06b6d4; /* Cyan */
+  --accent-primary: #7c3aed; /* Stitch Violet */
+  --accent-primary-hover: #6d28d9;
+  --accent-secondary: #d2bbff; /* Stitch Light Purple Glow */
+  --accent-secondary-hover: #b4c5ff;
+  --accent-accent: #06b6d4;
   
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
+  --danger: #ffb4ab;
+  --danger-hover: #ef4444;
   --warning: #f59e0b;
   
   color-scheme: dark;
@@ -1419,21 +1419,30 @@ textarea {
   box-sizing: border-box;
 }
 
-/* Glass Variant */
+/* Glass Variant - Stitch 32px Saturated Blur */
 .liquid-card-glass {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.8), 0 8px 32px 0 rgba(0, 0, 0, 0.06);
 }
 
 .dark-theme .liquid-card-glass {
-  background: rgba(17, 24, 39, 0.55);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: rgba(24, 28, 36, 0.75);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* High Elevation Glass - Stitch Elevated Variant */
+.liquid-card-elevated {
+  background: rgba(30, 34, 45, 0.85);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 12px 48px 0 rgba(124, 58, 237, 0.25);
 }
 
 /* Solid Variant for high legibility */
@@ -1498,18 +1507,41 @@ textarea {
 .p-md { padding: 1.75rem !important; }
 .p-lg { padding: 2.5rem !important; }
 
+/* Stitch Glowing Sidebar Navigation Item */
+.nav-item-active {
+  background: rgba(210, 187, 255, 0.15) !important;
+  box-shadow: inset 0 0 10px rgba(210, 187, 255, 0.2), 0 0 15px rgba(210, 187, 255, 0.1) !important;
+  border: 1px solid rgba(210, 187, 255, 0.3) !important;
+  color: var(--text-primary) !important;
+}
+
+.dark-theme .nav-item-active {
+  background: rgba(124, 58, 237, 0.2) !important;
+  box-shadow: inset 0 0 12px rgba(124, 58, 237, 0.3), 0 0 20px rgba(124, 58, 237, 0.2) !important;
+  border: 1px solid rgba(210, 187, 255, 0.4) !important;
+}
+
+/* ATS Score Progress Ring Glow */
+.progress-ring-circle {
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 0 8px rgba(210, 187, 255, 0.5));
+}
+
 /* Micro-interaction Spring & Glowing Buttons */
 .btn-glowing {
   position: relative;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+  background: linear-gradient(135deg, #7c3aed 0%, #4f378a 100%) !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 20px -4px rgba(37, 99, 235, 0.4) !important;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.3) !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease !important;
+  border: none !important;
 }
 
 .btn-glowing:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 10px 28px -4px rgba(124, 58, 237, 0.5) !important;
+  transform: scale(1.02) translateY(-1px) !important;
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
 }
 
 .btn-glowing:active {

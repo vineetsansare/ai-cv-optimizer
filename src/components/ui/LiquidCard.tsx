@@ -2,7 +2,7 @@ import React from 'react';
 
 interface LiquidCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  variant?: 'glass' | 'solid' | 'translucent' | 'glowing';
+  variant?: 'glass' | 'elevated' | 'solid' | 'translucent' | 'glowing';
   hoverEffect?: boolean;
   padding?: 'none' | 'sm' | 'md' | 'lg';
   className?: string;
