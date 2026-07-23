@@ -59,7 +59,7 @@ function App() {
   const [targetLength, setTargetLength] = useState<TargetLength>('2-page');
   
   // Theme & Layout States
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'workspace' | 'quick-optimize' | 'resumes' | 'applications' | 'reports' | 'settings'>('quick-optimize');
   const [isCustomizing, setIsCustomizing] = useState(false);
@@ -191,7 +191,8 @@ function App() {
       setTheme(savedTheme);
       applyTheme(savedTheme);
     } else {
-      applyTheme('light');
+      setTheme('dark');
+      applyTheme('dark');
     }
 
     const savedSidebar = localStorage.getItem(LOCAL_STORAGE_KEY_SIDEBAR);
