@@ -144,39 +144,39 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   <Sparkles size={22} />
                 </div>
                 <div>
-                  <h1 style={{ fontSize: '1.4rem', fontWeight: 900, margin: 0, letterSpacing: '-0.02em', color: '#FFFFFF' }}>JD2CV</h1>
+                  <h1 style={{ fontSize: '1.4rem', fontWeight: 900, margin: 0, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>JD2CV</h1>
                   <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em', margin: 0, color: 'var(--text-muted)', fontWeight: 700 }}>Career Workspace</p>
                 </div>
               </div>
 
               <div className="stagger-2">
-                <h2 style={{ fontSize: '2.4rem', fontWeight: 800, margin: '0 0 0.75rem 0', lineHeight: 1.15, letterSpacing: '-0.03em', color: '#FFFFFF' }}>
+                <h2 style={{ fontSize: '2.4rem', fontWeight: 800, margin: '0 0 0.75rem 0', lineHeight: 1.15, letterSpacing: '-0.03em', color: 'var(--text-primary)' }}>
                   Elevate your career with AI-powered ATS precision.
                 </h2>
-                <p style={{ fontSize: '1.05rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
                   Transform your experience bullet points to match target job descriptions seamlessly.
                 </p>
               </div>
 
               {/* Feature Highlights Card Deck with Slow Vertical Float Drift */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="stagger-3">
-                <div className="glass-card float-drift-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(124, 58, 237, 0.2)', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div className="glass-card float-drift-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(124, 58, 237, 0.15)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Zap size={18} />
                   </div>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>Instant Context Matching</h4>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)' }}>Extract relevant evidence across multiple uploaded baseline resumes.</p>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>Instant Context Matching</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Extract relevant evidence across multiple uploaded baseline resumes.</p>
                   </div>
                 </div>
 
-                <div className="glass-card float-drift-card-delayed" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(16,185,129,0.2)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div className="glass-card float-drift-card-delayed" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem 1.25rem', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(16,185,129,0.15)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <ShieldCheck size={18} />
                   </div>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>ATS Score Diagnostics</h4>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)' }}>Live keyword gap analytics and automated one-click fix recommendations.</p>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>ATS Score Diagnostics</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Live keyword gap analytics and automated one-click fix recommendations.</p>
                   </div>
                 </div>
               </div>
@@ -192,10 +192,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 style={{ maxWidth: '440px', width: '100%', margin: '0 auto' }}
               >
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                  <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: '#FFFFFF' }}>
+                  <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>
                     {isForgotPassword ? 'Reset Password' : isSignUp ? 'Create Your Account' : 'Welcome Back'}
                   </h2>
-                  <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem', margin: 0 }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0 }}>
                     {isForgotPassword 
                       ? 'Enter your email to receive a recovery link' 
                       : isSignUp ? 'Join the future of ATS customization' : 'Sign in to access your Career Workspace'}
@@ -337,7 +337,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     className="btn"
                     disabled={loading}
                     onClick={() => handleSocialLogin('google')}
-                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF' }}
+                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', color: 'var(--text-primary)' }}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.572 0-6.47-2.898-6.47-6.47s2.898-6.47 6.47-6.47c1.558 0 2.977.56 4.1 1.488l3.09-3.09C19.33 2.14 16.02 1 12.24 1 5.67 1 .35 6.32.35 12.89s5.32 11.89 11.89 11.89c7.22 0 11.89-5.08 11.89-12.09 0-.82-.08-1.61-.21-2.4H12.24z"/>
@@ -350,7 +350,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     className="btn"
                     disabled={loading}
                     onClick={() => handleSocialLogin('github')}
-                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF' }}
+                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', color: 'var(--text-primary)' }}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
@@ -364,7 +364,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   className="btn"
                   disabled={loading}
                   onClick={() => handleSocialLogin('linkedin_oidc')}
-                  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', marginTop: '0.75rem', width: '100%' }}
+                  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--card-border)', color: 'var(--text-primary)', marginTop: '0.75rem', width: '100%' }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
@@ -373,13 +373,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>
                     {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
                   </span>
                   <button
                     type="button"
                     onClick={() => triggerModeSwitch(() => setIsSignUp(!isSignUp))}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent-secondary)', fontWeight: 600, padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontWeight: 600, padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     {isSignUp ? 'Sign In' : 'Sign Up'}
                   </button>
