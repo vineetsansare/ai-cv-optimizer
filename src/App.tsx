@@ -110,6 +110,24 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const checkAndSendWelcomeEmail = async (email: string, fullName?: string) => {
+    if (!email) return;
+    const storageKey = `welcome_email_sent_${email}`;
+    if (localStorage.getItem(storageKey)) return;
+
+    try {
+      const proxyUrl = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
+      await fetch(`${proxyUrl}/api/email/welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name: fullName })
+      });
+      localStorage.setItem(storageKey, 'true');
+    } catch (e) {
+      console.error('Welcome email trigger error:', e);
+    }
+  };
+
   // 2. Fetch user profile and CVs from Supabase
   const loadUserData = async (currentSession: any) => {
     setAuthLoading(true);
@@ -133,25 +151,28 @@ function App() {
         retryCount++;
       }
 
-      if (profile) {
-        const plan = profile.plan as 'free' | 'byok' | 'pro';
-        setUserProfile({
-          email: profile.email,
-          full_name: profile.full_name,
-          plan,
-          generation_count: profile.generation_count || 0
-        });
+        if (profile) {
+          const plan = profile.plan as 'free' | 'byok' | 'pro';
+          setUserProfile({
+            email: profile.email,
+            full_name: profile.full_name,
+            plan,
+            generation_count: profile.generation_count || 0
+          });
 
-        if (plan === 'free') {
-          setConfig(prev => ({
-            ...prev,
-            provider: 'gemini',
-            model: 'gemini-1.5-flash'
-          }));
-        } else if (plan === 'byok') {
-          getSavedAPIKeysStatus().then(setSavedKeys);
+          if (plan === 'free') {
+            setConfig(prev => ({
+              ...prev,
+              provider: 'gemini',
+              model: 'gemini-1.5-flash'
+            }));
+          } else if (plan === 'byok') {
+            getSavedAPIKeysStatus().then(setSavedKeys);
+          }
+
+          // Trigger welcome email for first-time signups
+          checkAndSendWelcomeEmail(profile.email || currentSession.user.email, profile.full_name);
         }
-      }
 
       // Fetch user's saved CVs
       const { data: cvs, error: _cvError } = await supabase

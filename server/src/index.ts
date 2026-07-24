@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 import llmRoutes from './routes/llm.js';
 import keyRoutes from './routes/keys.js';
+import emailRoutes from './routes/email.js';
 
 // Load environment variables
 dotenv.config();
@@ -38,6 +39,7 @@ await fastify.register(cors, {
 // Register routes
 await fastify.register(llmRoutes, { prefix: '/api/llm' });
 await fastify.register(keyRoutes, { prefix: '/api/keys' });
+await fastify.register(emailRoutes, { prefix: '/api/email' });
 
 // Health check
 fastify.get('/health', async () => {
