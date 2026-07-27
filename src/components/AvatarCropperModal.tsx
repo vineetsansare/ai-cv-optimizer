@@ -53,13 +53,17 @@ export const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({
     ctx.clearRect(0, 0, width, height);
     ctx.save();
 
+    // Calculate aspect ratio scaling so high-res image initially fits viewport
+    const baseScale = Math.max(width / img.width, height / img.height);
+    const drawWidth = img.width * baseScale * zoom;
+    const drawHeight = img.height * baseScale * zoom;
+
     // Move to center of canvas for scaling and rotation
     ctx.translate(width / 2 + position.x, height / 2 + position.y);
     ctx.rotate((rotation * Math.PI) / 180);
-    ctx.scale(zoom, zoom);
 
-    // Draw image centered
-    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+    // Draw image centered with aspect-ratio scaled dimensions
+    ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
 
     ctx.restore();
   };
@@ -100,19 +104,18 @@ export const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({
     ctx.clip();
 
     ctx.save();
-    ctx.translate(100, 100);
-    ctx.rotate((rotation * Math.PI) / 180);
-    ctx.scale(zoom, zoom);
 
-    // Scale calculation relative to original image size vs 200px viewport
-    const scaleFactor = 200 / Math.min(img.width, img.height);
-    const drawWidth = img.width * scaleFactor;
-    const drawHeight = img.height * scaleFactor;
+    const baseScale = Math.max(200 / img.width, 200 / img.height);
+    const drawWidth = img.width * baseScale * zoom;
+    const drawHeight = img.height * baseScale * zoom;
+
+    ctx.translate(100 + (position.x * (200 / 260)), 100 + (position.y * (200 / 260)));
+    ctx.rotate((rotation * Math.PI) / 180);
 
     ctx.drawImage(
       img,
-      -drawWidth / 2 + (position.x * (200 / 260)),
-      -drawHeight / 2 + (position.y * (200 / 260)),
+      -drawWidth / 2,
+      -drawHeight / 2,
       drawWidth,
       drawHeight
     );
@@ -205,7 +208,7 @@ export const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({
             <ZoomOut size={16} style={{ color: 'var(--text-muted)' }} />
             <input
               type="range"
-              min="0.8"
+              min="0.4"
               max="3"
               step="0.05"
               value={zoom}
