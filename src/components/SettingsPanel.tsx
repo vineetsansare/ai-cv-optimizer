@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, ShieldCheck, Zap, LogOut, CheckCircle2, Info } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Settings, ShieldCheck, Zap, LogOut, CheckCircle2, Info, Camera } from 'lucide-react';
 import type { LLMConfig } from '../utils/llm';
 import { saveUserAPIKey, deleteUserAPIKey, getSavedAPIKeysStatus } from '../utils/llm';
+import { AvatarCropperModal } from './AvatarCropperModal';
 
 interface SettingsPanelProps {
   config: LLMConfig;
   onChangeConfig: (config: LLMConfig) => void;
-  userProfile: { email: string; full_name?: string; plan: 'free' | 'byok' | 'pro'; generation_count: number } | null;
+  userProfile: { email: string; full_name?: string; plan: 'free' | 'byok' | 'pro'; generation_count: number; avatar_url?: string } | null;
   onLogout: () => void;
+  onUpdateAvatar?: (avatarUrl: string) => Promise<void>;
 }
 
 const PROVIDER_MODELS = {
@@ -20,7 +22,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   config,
   onChangeConfig,
   userProfile,
-  onLogout
+  onLogout,
+  onUpdateAvatar
 }) => {
   const [keyInput, setKeyInput] = useState('');
   const [savedKeys, setSavedKeys] = useState<{ gemini: boolean; openai: boolean; anthropic: boolean }>({
@@ -31,6 +34,54 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [savingKey, setSavingKey] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Avatar Upload States
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handleAvatarFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset input
+    e.target.value = '';
+
+    // Enforce 2MB size limit ceiling
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMsg('Image size exceeds 2MB limit. Please select a smaller photo.');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Please select a valid image file (PNG, JPEG, WEBP).');
+      return;
+    }
+
+    setErrorMsg('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropSave = async (croppedDataUrl: string) => {
+    setCropImageSrc(null);
+    if (!onUpdateAvatar) return;
+
+    setUploadingAvatar(true);
+    setErrorMsg('');
+    try {
+      await onUpdateAvatar(croppedDataUrl);
+      setSuccessMsg('Profile avatar updated successfully!');
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message || 'Failed to update avatar.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   useEffect(() => {
     if (userProfile?.plan === 'byok') {
@@ -114,17 +165,98 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
         {userProfile && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            
+            {/* Profile Avatar Card */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>
-                {(userProfile.full_name || userProfile.email)[0].toUpperCase()}
+              <div style={{ position: 'relative', width: '56px', height: '56px', flexShrink: 0 }}>
+                {userProfile.avatar_url ? (
+                  <img
+                    src={userProfile.avatar_url}
+                    alt={userProfile.full_name || 'Profile Avatar'}
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid var(--accent-primary)',
+                      boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.3rem',
+                    fontWeight: 700,
+                    color: '#fff'
+                  }}>
+                    {(userProfile.full_name || userProfile.email)[0].toUpperCase()}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  style={{
+                    position: 'absolute',
+                    bottom: '-2px',
+                    right: '-2px',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: 'var(--accent-primary)',
+                    border: '2px solid var(--card-bg)',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                  title="Upload profile picture"
+                >
+                  <Camera size={12} />
+                </button>
               </div>
-              <div style={{ overflow: 'hidden' }}>
-                <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+
+              <div style={{ flexGrow: 1, overflow: 'hidden' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                   {userProfile.full_name || 'User'}
                 </h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 0.35rem 0' }}>
                   {userProfile.email}
                 </p>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input
+                    type="file"
+                    ref={avatarInputRef}
+                    onChange={handleAvatarFileSelect}
+                    accept="image/png,image/jpeg,image/webp"
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--accent-primary)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      padding: 0,
+                      cursor: 'pointer',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    {uploadingAvatar ? 'Uploading...' : userProfile.avatar_url ? 'Change Avatar' : 'Upload Avatar'}
+                  </button>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>• Max 2MB</span>
+                </div>
               </div>
             </div>
 
@@ -290,6 +422,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           )}
         </div>
       </div>
+
+      {cropImageSrc && (
+        <AvatarCropperModal
+          imageSrc={cropImageSrc}
+          onClose={() => setCropImageSrc(null)}
+          onCropComplete={handleCropSave}
+        />
+      )}
 
     </div>
   );

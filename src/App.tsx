@@ -39,6 +39,7 @@ interface UserProfile {
   full_name?: string;
   plan: 'free' | 'byok' | 'pro';
   generation_count: number;
+  avatar_url?: string;
 }
 
 function App() {
@@ -165,7 +166,7 @@ function App() {
       while (retryCount < 5) {
         const { data, error: _error } = await supabase
           .from('profiles')
-          .select('email, full_name, plan, generation_count')
+          .select('email, full_name, plan, generation_count, avatar_url')
           .eq('id', currentSession.user.id)
           .maybeSingle();
 
@@ -184,7 +185,8 @@ function App() {
             email: profile.email,
             full_name: profile.full_name,
             plan,
-            generation_count: profile.generation_count || 0
+            generation_count: profile.generation_count || 0,
+            avatar_url: profile.avatar_url
           });
 
           if (plan === 'free') {
@@ -221,6 +223,22 @@ function App() {
     } finally {
       setAuthLoading(false);
     }
+  };
+
+  const handleUpdateAvatar = async (croppedDataUrl: string) => {
+    if (!session?.user?.id) return;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ avatar_url: croppedDataUrl })
+      .eq('id', session.user.id);
+
+    if (error) {
+      console.error('Failed to update avatar in database:', error);
+      throw error;
+    }
+
+    setUserProfile((prev) => prev ? { ...prev, avatar_url: croppedDataUrl } : prev);
   };
 
   // 3. Load configurations & theme from localStorage
@@ -1768,6 +1786,7 @@ function App() {
                     onChangeConfig={handleConfigChange}
                     userProfile={userProfile}
                     onLogout={handleLogout}
+                    onUpdateAvatar={handleUpdateAvatar}
                   />
                 )}
               </>
