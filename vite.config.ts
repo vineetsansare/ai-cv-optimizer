@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ command }) => ({
   plugins: [react()],
-  base: command === 'build' ? '/my-experiments/ai-cv-optimizer/' : '/',
+  base: command === 'build' ? '/ai-cv-optimizer/' : '/',
 }))
