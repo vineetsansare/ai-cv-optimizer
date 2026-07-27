@@ -1,8 +1,17 @@
 // A customized, robust client-side Markdown to HTML parser tailored specifically for CVs.
 // Replicates the Apple/Vineet styling (centered headers, double lines, justified text, space-between flex rows for dates, 2-column skills grids, inline contact SVG icons).
 
-export function parseMarkdownToHtml(markdown: string): string {
+export interface CVParseOptions {
+  accentColor?: string;
+  showPhoto?: boolean;
+  photoUrl?: string;
+}
+
+export function parseMarkdownToHtml(markdown: string, options: CVParseOptions = {}): string {
   if (!markdown) return '';
+
+  const accentColor = options.accentColor || '#7c3aed';
+  const showPhoto = options.showPhoto && options.photoUrl;
 
   const lines = markdown
     // Escape HTML tags to prevent XSS
@@ -35,7 +44,16 @@ export function parseMarkdownToHtml(markdown: string): string {
       inSkills = false;
 
       const name = line.substring(2).trim();
-      processedLines.push(`<h1>${name}</h1>`);
+      if (showPhoto) {
+        processedLines.push(
+          `<div class="cv-header-photo-wrapper">` +
+            `<img src="${options.photoUrl}" alt="${name}" class="cv-avatar-headshot" />` +
+            `<div class="cv-header-photo-info">` +
+              `<h1>${name}</h1>`
+        );
+      } else {
+        processedLines.push(`<h1>${name}</h1>`);
+      }
       justSawH1 = true;
       continue;
     }
@@ -86,7 +104,11 @@ export function parseMarkdownToHtml(markdown: string): string {
         }
       });
 
-      processedLines.push(`<div class="contact-row">${formattedParts.join('')}</div>`);
+      if (showPhoto) {
+        processedLines.push(`<div class="contact-row">${formattedParts.join('')}</div></div></div>`);
+      } else {
+        processedLines.push(`<div class="contact-row">${formattedParts.join('')}</div>`);
+      }
       justSawH1 = false;
       continue;
     }
@@ -208,7 +230,8 @@ export function parseMarkdownToHtml(markdown: string): string {
   if (skillsListOpen) processedLines.push('</ul>');
   if (inList) processedLines.push('</ul>');
 
-  return processedLines.join('\n').replace(/\n{2,}/g, '\n');
+  const rawHtml = processedLines.join('\n').replace(/\n{2,}/g, '\n');
+  return `<div class="cv-styled-document" style="--cv-accent-color: ${accentColor};">${rawHtml}</div>`;
 }
 
 /**

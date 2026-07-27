@@ -3,6 +3,8 @@ import { Eye, FileEdit, BarChart3, Sparkles, Printer, Copy, Check, Mail } from '
 import type { CVGenerationResult } from '../utils/llm';
 import { parseMarkdownToHtml, stripMarkdown } from '../utils/mdParser';
 import { LiquidCard } from './ui/LiquidCard';
+import { CVThemeSelector } from './CVThemeSelector';
+import type { CVThemeConfig } from './CVThemeSelector';
 
 interface CVDisplayProps {
   result: CVGenerationResult;
@@ -23,6 +25,12 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('preview');
   const [copied, setCopied] = useState<'markdown' | 'text' | 'cover' | null>(null);
+  const [themeConfig, setThemeConfig] = useState<CVThemeConfig>({
+    accentColor: '#7c3aed',
+    themeName: 'Executive Violet',
+    showPhoto: false,
+    photoUrl: userProfile?.avatar_url || ''
+  });
 
   const handleCopyMarkdown = () => {
     navigator.clipboard.writeText(result.cvMarkdown);
@@ -229,11 +237,18 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
 
       <div className="cv-display-content" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: '1rem' }}>
         {activeTab === 'preview' && (
-          <div className="print-pane" style={{ background: 'var(--bg-primary)', padding: '2rem 1rem', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'center', overflowX: 'auto', border: '1px solid var(--card-border)' }}>
-            <div 
-              className="resume-preview-sheet" 
-              dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(result.cvMarkdown) }}
+          <div>
+            <CVThemeSelector 
+              themeConfig={themeConfig} 
+              onChangeThemeConfig={setThemeConfig} 
+              userAvatarUrl={userProfile?.avatar_url} 
             />
+            <div className="print-pane" style={{ background: 'var(--bg-primary)', padding: '2rem 1rem', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'center', overflowX: 'auto', border: '1px solid var(--card-border)' }}>
+              <div 
+                className="resume-preview-sheet" 
+                dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(result.cvMarkdown, themeConfig) }}
+              />
+            </div>
           </div>
         )}
 

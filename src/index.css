@@ -651,8 +651,9 @@ textarea {
 /* Exact section divider header styling from PDF */
 .resume-preview-sheet h2 {
   font-size: 10.5pt;
-  border-top: 1px solid #111827 !important;
-  border-bottom: 1px solid #111827 !important;
+  border-top: 1.5px solid var(--cv-accent-color, #111827) !important;
+  border-bottom: 1.5px solid var(--cv-accent-color, #111827) !important;
+  color: var(--cv-accent-color, #111827) !important;
   padding: 3px 0 !important;
   margin-top: 1.2rem !important;
   margin-bottom: 0.6rem !important;
@@ -661,6 +662,51 @@ textarea {
   text-align: center;
   font-weight: 700;
   display: block !important;
+}
+
+.cv-styled-document h1 {
+  color: var(--cv-accent-color, #111827);
+}
+
+.cv-styled-document .contact-item svg {
+  color: var(--cv-accent-color, #111827) !important;
+}
+
+/* Candidate Photo Avatar Header */
+.cv-header-photo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.cv-avatar-headshot {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid var(--cv-accent-color, #111827);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.cv-header-photo-info {
+  flex-grow: 1;
+}
+
+.cv-header-photo-info h1 {
+  text-align: left !important;
+  margin: 0 !important;
+}
+
+.cv-header-photo-info .subtitle {
+  text-align: left !important;
+}
+
+.cv-header-photo-info .contact-row {
+  justify-content: flex-start !important;
+  margin-bottom: 0 !important;
 }
 
 /* Position entries space-between */
