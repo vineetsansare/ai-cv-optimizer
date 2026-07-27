@@ -23,7 +23,7 @@ const LOCAL_STORAGE_KEY_SIDEBAR = 'cv_builder_sidebar_collapsed';
 const DEFAULT_CONFIG: LLMConfig = {
   provider: 'gemini',
   apiKey: '',
-  model: 'gemini-1.5-flash',
+  model: 'gemini-2.5-flash',
 };
 
 interface CloudCV {
@@ -164,7 +164,7 @@ function App() {
             setConfig(prev => ({
               ...prev,
               provider: 'gemini',
-              model: 'gemini-1.5-flash'
+              model: 'gemini-2.5-flash'
             }));
           } else if (plan === 'byok') {
             getSavedAPIKeysStatus().then(setSavedKeys);

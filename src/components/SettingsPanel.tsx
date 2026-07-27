@@ -11,7 +11,7 @@ interface SettingsPanelProps {
 }
 
 const PROVIDER_MODELS = {
-  gemini: ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash'],
+  gemini: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-pro'],
   openai: ['gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
   anthropic: ['claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest', 'claude-3-opus-20240229']
 };

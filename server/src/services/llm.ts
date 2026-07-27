@@ -156,16 +156,18 @@ async function callGemini(config: LLMCallConfig, systemPrompt: string, userPromp
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = errorData.error?.message || `Gemini API call failed with status ${response.status}`;
 
-    // Automatic fallback to gemini-1.5-flash if quota exceeded or 429 rate limit
+    // Automatic fallback to gemini-flash-latest if model error or 429 rate limit
     if (
-      config.model !== 'gemini-1.5-flash' &&
+      config.model !== 'gemini-flash-latest' &&
       (response.status === 429 ||
+       response.status === 404 ||
+       errorMessage.includes('not found') ||
        errorMessage.includes('Quota exceeded') ||
        errorMessage.includes('RESOURCE_EXHAUSTED') ||
        errorMessage.includes('limit: 0'))
     ) {
-      console.warn(`[Gemini Fallback Triggered] Model '${config.model}' hit quota limit. Falling back to 'gemini-1.5-flash'...`);
-      return callGemini({ ...config, model: 'gemini-1.5-flash' }, systemPrompt, userPrompt);
+      console.warn(`[Gemini Fallback Triggered] Model '${config.model}' failed (${errorMessage}). Falling back to 'gemini-flash-latest'...`);
+      return callGemini({ ...config, model: 'gemini-flash-latest' }, systemPrompt, userPrompt);
     }
 
     throw new Error(errorMessage);
