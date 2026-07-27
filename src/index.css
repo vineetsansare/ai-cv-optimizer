@@ -672,41 +672,61 @@ textarea {
   color: var(--cv-accent-color, #111827) !important;
 }
 
-/* Candidate Photo Avatar Header */
+/* Executive Candidate Photo Avatar Header */
 .cv-header-photo-wrapper {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--cv-accent-color, #111827);
 }
 
 .cv-avatar-headshot {
-  width: 72px;
-  height: 72px;
+  width: 86px;
+  height: 86px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2.5px solid var(--cv-accent-color, #111827);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid var(--cv-accent-color, #111827);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
 }
 
 .cv-header-photo-info {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .cv-header-photo-info h1 {
+  font-size: 22pt !important;
   text-align: left !important;
-  margin: 0 !important;
+  margin: 0 0 0.15rem 0 !important;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--cv-accent-color, #111827);
 }
 
 .cv-header-photo-info .subtitle {
+  font-size: 11.5pt !important;
   text-align: left !important;
+  color: #4b5563 !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
 }
 
 .cv-header-photo-info .contact-row {
+  display: flex !important;
   justify-content: flex-start !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 1.1rem !important;
+  font-size: 9pt !important;
+  color: #374151 !important;
   margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 /* Position entries space-between */

@@ -205,7 +205,14 @@ export const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({
           
           {/* Zoom Slider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <ZoomOut size={16} style={{ color: 'var(--text-muted)' }} />
+            <button
+              type="button"
+              onClick={() => setZoom((prev) => Math.max(0.4, Math.round((prev - 0.1) * 100) / 100))}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', padding: '0.2rem', borderRadius: '4px' }}
+              title="Zoom Out"
+            >
+              <ZoomOut size={18} />
+            </button>
             <input
               type="range"
               min="0.4"
@@ -215,7 +222,14 @@ export const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({
               onChange={(e) => setZoom(parseFloat(e.target.value))}
               style={{ flexGrow: 1, accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
             />
-            <ZoomIn size={16} style={{ color: 'var(--text-muted)' }} />
+            <button
+              type="button"
+              onClick={() => setZoom((prev) => Math.min(3, Math.round((prev + 0.1) * 100) / 100))}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', padding: '0.2rem', borderRadius: '4px' }}
+              title="Zoom In"
+            >
+              <ZoomIn size={18} />
+            </button>
           </div>
 
           {/* Rotate Button */}

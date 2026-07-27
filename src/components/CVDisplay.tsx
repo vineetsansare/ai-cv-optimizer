@@ -237,7 +237,7 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
 
       <div className="cv-display-content" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: '1rem' }}>
         {activeTab === 'preview' && (
-          <div>
+          <>
             <CVThemeSelector 
               themeConfig={themeConfig} 
               onChangeThemeConfig={setThemeConfig} 
@@ -249,7 +249,7 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
                 dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(result.cvMarkdown, themeConfig) }}
               />
             </div>
-          </div>
+          </>
         )}
 
         {activeTab === 'editor' && (
