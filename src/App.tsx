@@ -9,12 +9,14 @@ import {
   Sparkles, Sun, Moon, AlertCircle,
   FileText, Settings, LogOut, ChevronLeft, ChevronRight,
   Upload, Plus, Download, Trash2,
-  Copy, ArrowRight, Zap, ArrowLeft
+  Copy, ArrowRight, Zap, ArrowLeft, History
 } from 'lucide-react';
 import { supabase } from './utils/supabase';
 import { AuroraBackground } from './components/ui/AuroraBackground';
 import { LiquidCard } from './components/ui/LiquidCard';
 import { UploadIllustration, AICoachIllustration, EmptyStateIllustration } from './components/ui/Illustrations';
+import { CVHistoryPanel } from './components/CVHistoryPanel';
+import type { GenerationRecord } from './components/CVHistoryPanel';
 
 const LOCAL_STORAGE_KEY_CONFIG = 'cv_builder_llm_config';
 const LOCAL_STORAGE_KEY_THEME = 'cv_builder_theme';
@@ -61,10 +63,35 @@ function App() {
   // Theme & Layout States
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState<'workspace' | 'quick-optimize' | 'resumes' | 'applications' | 'reports' | 'settings'>('quick-optimize');
+  const [activeTab, setActiveTab] = useState<'workspace' | 'quick-optimize' | 'resumes' | 'history' | 'applications' | 'reports' | 'settings'>('quick-optimize');
+  const [generations, setGenerations] = useState<GenerationRecord[]>([]);
+  const [generationsLoading, setGenerationsLoading] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [customizerStep, setCustomizerStep] = useState(1);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const fetchRecentGenerations = async () => {
+    setGenerationsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data, error } = await supabase
+        .from('generations')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (data && !error) {
+        setGenerations(data as GenerationRecord[]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch generations history:', err);
+    } finally {
+      setGenerationsLoading(false);
+    }
+  };
 
   const [generating, setGenerating] = useState(false);
   const [isAutoFixing, setIsAutoFixing] = useState(false);
@@ -661,6 +688,19 @@ function App() {
             >
               <FileText size={18} />
               {!sidebarCollapsed && <span className="font-label-sm">My Resumes</span>}
+            </button>
+
+            <button 
+              className={`tab ${activeTab === 'history' && !isCustomizing ? 'active nav-item-active' : ''}`} 
+              onClick={() => { 
+                setActiveTab('history'); 
+                setIsCustomizing(false);
+                fetchRecentGenerations();
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: 'none', background: 'none', color: 'inherit', textAlign: 'left', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <History size={18} />
+              {!sidebarCollapsed && <span className="font-label-sm">CV History</span>}
             </button>
 
             <div style={{ margin: '1rem 0 0.5rem 0.5rem', fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>
@@ -1627,6 +1667,26 @@ function App() {
                 {activeTab === 'workspace' && renderWorkspaceTab()}
                 {activeTab === 'quick-optimize' && renderQuickOptimizeTab()}
                 {activeTab === 'resumes' && renderResumesTab()}
+                
+                {activeTab === 'history' && (
+                  <CVHistoryPanel
+                    generations={generations}
+                    loading={generationsLoading}
+                    onSelectGeneration={(gen) => {
+                      setResult({
+                        cvMarkdown: gen.cv_markdown,
+                        atsScore: gen.ats_score || 85,
+                        atsAnalysis: gen.ats_analysis || { matchedKeywords: [], missingKeywords: [], strengths: [], weaknesses: [], actionItems: [] },
+                        humanFriendlyChanges: gen.human_changes || [],
+                        coverLetter: gen.cover_letter || ''
+                      });
+                      if (gen.job_description) {
+                        setJobDescription(gen.job_description);
+                      }
+                      setActiveTab('quick-optimize');
+                    }}
+                  />
+                )}
                 
                 {activeTab === 'applications' && (
                   <div className="glass-card entrance-fade" style={{ padding: 0, overflow: 'hidden' }}>
