@@ -26,8 +26,8 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('preview');
   const [copied, setCopied] = useState<'markdown' | 'text' | 'cover' | null>(null);
   const [themeConfig, setThemeConfig] = useState<CVThemeConfig>({
-    accentColor: '#7c3aed',
-    themeName: 'Executive Violet',
+    accentColor: '#475569',
+    themeName: 'Slate Charcoal',
     showPhoto: false,
     photoUrl: userProfile?.avatar_url || ''
   });

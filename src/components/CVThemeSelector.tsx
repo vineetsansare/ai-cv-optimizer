@@ -9,11 +9,11 @@ export interface CVThemeConfig {
 }
 
 export const ACCENT_THEMES = [
+  { id: 'charcoal', name: 'Slate Charcoal', color: '#475569', bg: 'rgba(71, 85, 105, 0.15)' },
   { id: 'violet', name: 'Executive Violet', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.15)' },
   { id: 'blue', name: 'Sapphire Blue', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)' },
   { id: 'teal', name: 'Emerald Teal', color: '#059669', bg: 'rgba(5, 150, 105, 0.15)' },
-  { id: 'rose', name: 'Creative Rose', color: '#e11d48', bg: 'rgba(225, 29, 72, 0.15)' },
-  { id: 'charcoal', name: 'Slate Charcoal', color: '#475569', bg: 'rgba(71, 85, 105, 0.15)' }
+  { id: 'rose', name: 'Creative Rose', color: '#e11d48', bg: 'rgba(225, 29, 72, 0.15)' }
 ];
 
 interface CVThemeSelectorProps {

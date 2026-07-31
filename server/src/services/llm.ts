@@ -15,19 +15,20 @@ export async function generateCustomizedCVServer(
 ): Promise<CVGenerationResult> {
   let lengthConstraint = "";
   if (targetLength === '1-page') {
-    lengthConstraint = "3. **Strict 1-Page Resume Constraint**: Ensure the resume is ruthlessly optimized, concise, and fits strictly within a 1-page ceiling (approx 350-450 words). Limit roles to the most recent 10 years, heavily truncate older roles to 1-liners, and allow a maximum of 3 highly impactful bullet points per role.";
+    lengthConstraint = "3. **CRITICAL 1-PAGE PHYSICAL PRINT BUDGET**: The generated resume MUST fit onto EXACTLY 1 A4 PAGE when printed or exported as a PDF. Enforce a strict word limit ceiling of **320 to 380 words TOTAL**. Limit the Executive Profile to 2-3 concise sentences. Include ONLY the top 3-4 most relevant positions. For each role, provide a maximum of 2-3 high-impact bullet points. Limit Technical Skills to 5-6 category lines. DO NOT EXCEED 380 WORDS TOTAL, or the rendered PDF will spill onto Page 2 and ruin the layout!";
   } else if (targetLength === '2-page') {
-    lengthConstraint = "3. **Strict 2-Page Constraint**: Ensure the resume is highly optimized, concise, and fits strictly within a 2-page ceiling (approximately 500-750 words). Filter out minor or redundant details, and focus on high-impact accomplishments.";
+    lengthConstraint = "3. **CRITICAL 2-PAGE PHYSICAL PRINT BUDGET**: The generated resume MUST fit onto EXACTLY 2 A4 PAGES when printed or exported as a PDF. Enforce a strict word limit ceiling of **650 to 750 words TOTAL**. Filter out minor details, include roles from the last 10-12 years, providing 3-4 bullets per major role. DO NOT EXCEED 750 WORDS TOTAL, or the rendered PDF will spill onto Page 3!";
   } else {
     lengthConstraint = "3. **Comprehensive CV Format**: Provide a detailed, multi-page Curriculum Vitae. Include all relevant past roles, comprehensive bullet points for each, and maintain an exhaustive list of achievements and responsibilities that match the JD keywords. Do not overly truncate the history.";
   }
 
-  const systemPrompt = `You are an expert resume writer and recruiter specializing in ATS (Applicant Tracking System) optimization and human-friendly storytelling.
-Your job is to rewrite a candidate's resume/career history to perfectly align with a target Job Description (JD) and also write a customized cover letter.
+  const systemPrompt = `You are a World-Class Senior Executive Technical Recruiter with 20+ years of experience shortlisting top 1% candidates for Fortune 500 tech enterprises and high-growth startups.
+Your job is to rewrite a candidate's resume/career history to perfectly align with a target Job Description (JD) and write a customized cover letter.
 
-Here are the strict guidelines:
-1. **Truthfulness**: Rely ONLY on facts, roles, and achievements present in the provided career history (uploaded CVs). Do NOT invent jobs, companies, credentials, or achievements.
-2. **ATS Optimization**: Identify critical keywords, technical skills, and phrases in the Job Description, and naturally integrate them into the candidate's experience where applicable. **CRITICAL: You MUST aim for a >95% ATS keyword match score. Ruthlessly find organic ways to include as many target keywords as mathematically possible without lying.**
+CRITICAL DIRECTIVES:
+1. **Senior Recruiter Voice & Authentic Human Polish**: Write in an authentic, confident, human voice. NEVER use robotic AI tropes, empty fluff, or generic buzzwords (e.g., 'synergy', 'spearheaded', 'testament to', 'proven track record of'). Use active, metric-driven language (e.g., 'Reduced API latency by 42%', 'Delivered mobile checkout for 1.2M active users'). The recruiter reading this MUST feel it was naturally written by an elite candidate themselves.
+2. **Fact-Based Truthfulness**: Rely ONLY on facts, roles, and achievements present in the provided career history (uploaded CVs). Do NOT invent jobs, companies, credentials, or achievements.
+3. **ATS Precision (>95% Match Score)**: Identify critical keywords, technical skills, and key phrases in the Job Description, and naturally integrate them into the candidate's experience where applicable. **CRITICAL: You MUST aim for a >95% ATS keyword match score without lying.**
 ${lengthConstraint}
 4. **Professional Formatting**: Format headings to match the user's specific CV format:
    - The very top of the resume MUST start with the candidate's Name as an H1, immediately followed by the exact Target Job Title (from the JD) as an italicized subtitle on the next line. Like this:
@@ -49,8 +50,7 @@ ${lengthConstraint}
    - For TECHNICAL SKILLS & COMPETENCIES, write the skills as a bulleted list where each bullet starts with the bold category and a colon, e.g.:
      * **Mobile Architecture**: Modular Architecture, MVVM, Swift, ...
    - Use bolding (**text**) judiciously throughout the CV to highlight key technical skills, impactful metrics, and critical qualifications to draw the recruiter's eye.
-5. **Human Readability**: Ensure the content sounds like it is written by a normal human professional, not copy-pasted from an AI tool. Avoid robotic transitions, cliché AI buzzwords, or overly complex vocabulary. Build credibility and trust through clear, authentic, and factual storytelling.
-6. **Custom Cover Letter**: Write a short, punchy, and summarized Cover Letter (under 250 words) targeted to the recruiting team of the organization in the JD. It should highlight the applicant's top matches, explain their interest, and make it extremely easy for a recruiter to shortlist the candidate.`;
+5. **Custom Cover Letter**: Write a short, punchy, and summarized Cover Letter (under 200 words) targeted to the hiring team in the JD. Highlight top matches, explain interest, and make it effortless for a recruiter to shortlist the candidate.`;
 
   const userPrompt = `
 === TARGET JOB DESCRIPTION ===

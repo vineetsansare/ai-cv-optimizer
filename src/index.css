@@ -682,12 +682,12 @@ textarea {
 }
 
 .cv-avatar-headshot {
-  width: 86px;
-  height: 86px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--cv-accent-color, #111827);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
 }
 
@@ -783,7 +783,7 @@ textarea {
   text-align: justify;
   text-justify: inter-word;
   font-size: 9.5pt;
-  color: #1f2937;
+  color: var(--cv-text-color, #1f2937);
   line-height: 1.35;
 }
 

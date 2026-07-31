@@ -10,8 +10,18 @@ export interface CVParseOptions {
 export function parseMarkdownToHtml(markdown: string, options: CVParseOptions = {}): string {
   if (!markdown) return '';
 
-  const accentColor = options.accentColor || '#7c3aed';
+  const accentColor = options.accentColor || '#475569';
   const showPhoto = options.showPhoto && options.photoUrl;
+
+  // Complementary dark text color map matching accent theme palette
+  const textColorMap: Record<string, string> = {
+    '#475569': '#1e293b', // Slate Charcoal -> Deep Slate
+    '#7c3aed': '#1e1b2e', // Executive Violet -> Deep Violet Slate
+    '#2563eb': '#0f172a', // Sapphire Blue -> Deep Navy Slate
+    '#059669': '#062e24', // Emerald Teal -> Deep Forest Charcoal
+    '#e11d48': '#271016'  // Creative Rose -> Deep Crimson Charcoal
+  };
+  const bodyTextColor = textColorMap[accentColor] || '#1f2937';
 
   const lines = markdown
     // Escape HTML tags to prevent XSS
@@ -231,7 +241,7 @@ export function parseMarkdownToHtml(markdown: string, options: CVParseOptions = 
   if (inList) processedLines.push('</ul>');
 
   const rawHtml = processedLines.join('\n').replace(/\n{2,}/g, '\n');
-  return `<div class="cv-styled-document" style="--cv-accent-color: ${accentColor};">${rawHtml}</div>`;
+  return `<div class="cv-styled-document" style="--cv-accent-color: ${accentColor}; --cv-text-color: ${bodyTextColor};">${rawHtml}</div>`;
 }
 
 /**
